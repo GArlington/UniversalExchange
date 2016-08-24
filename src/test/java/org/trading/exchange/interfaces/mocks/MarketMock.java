@@ -1,30 +1,32 @@
 package org.trading.exchange.interfaces.mocks;
 
-import org.trading.exchange.interfaces.CommodityImpl;
-import org.trading.exchange.interfaces.MarketImpl;
+import org.trading.exchange.interfaces.Market;
+import org.trading.exchange.publicInterfaces.Commodity;
 import org.trading.exchange.publicInterfaces.Exchangeable;
 import org.trading.exchange.publicInterfaces.Location;
 
+import java.util.Arrays;
 import java.util.Collection;
 
 /**
- * Created by GArlington on 19/08/2016.
+ * Created by GArlington.
  */
-public class MarketMock implements MarketImpl {
+public class MarketMock implements Market {
     private String id;
     private Location location;
     private String name;
-    private CommodityImpl offered;
-    private CommodityImpl required;
+    private Commodity offered;
+    private Commodity required;
     private Collection<Exchangeable> orders;
 
-    public MarketMock(String id, Location location, String name, CommodityImpl offered, CommodityImpl required, Collection<Exchangeable> orders) {
+    public MarketMock(String id, Location location, String name, Commodity offered, Commodity required,
+                      Exchangeable... orders) {
         this.id = id;
         this.location = location;
         this.name = name;
         this.offered = offered;
         this.required = required;
-        this.orders = orders;
+        this.orders = Arrays.asList(orders);
         validateMarket();
     }
 
@@ -44,12 +46,12 @@ public class MarketMock implements MarketImpl {
     }
 
     @Override
-    public CommodityImpl getOffered() {
+    public Commodity getOffered() {
         return offered;
     }
 
     @Override
-    public CommodityImpl getRequired() {
+    public Commodity getRequired() {
         return required;
     }
 
@@ -58,17 +60,15 @@ public class MarketMock implements MarketImpl {
         return orders;
     }
 
-/*
     @Override
     public String toString() {
         return "MarketMock{" +
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
-                ", offered=" + offered +
-                ", required=" + required +
-                ", location=" + location +
-                ", orders=" + orders +
+                ", \noffered=" + offered +
+                ", \nrequired=" + required +
+                ", \nlocation=" + location +
+                ", \norders=\n" + orders +
                 '}' + '\n';
     }
-*/
 }

@@ -5,7 +5,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.math.SimpleDecimal;
 import org.trading.exchange.interfaces.mocks.ExchangeableMock;
-import org.trading.exchange.publicInterfaces.Commodity;
 
 import static org.junit.Assert.assertEquals;
 
@@ -13,14 +12,14 @@ import static org.junit.Assert.assertEquals;
  * Created by GArlington.
  */
 public class ExchangeableTest {
-    Commodity fromCommodity = CommodityImpl.SILVER;
-    Commodity fromCommodity2 = CommodityImpl.GOLD;
+    org.trading.exchange.publicInterfaces.Commodity fromCommodity = Commodity.SILVER;
+    org.trading.exchange.publicInterfaces.Commodity fromCommodity2 = Commodity.GOLD;
     long fromValue = 3;
-    Commodity toCommodity = CommodityImpl.USD;
+    org.trading.exchange.publicInterfaces.Commodity toCommodity = Commodity.USD;
     long toValue = 722;
-    Commodity toCommodity2 = CommodityImpl.GBP;
+    org.trading.exchange.publicInterfaces.Commodity toCommodity2 = Commodity.GBP;
 
-    ExchangeableImpl victim;
+    Exchangeable victim;
 
     boolean debugOutput = false;
 
@@ -37,42 +36,42 @@ public class ExchangeableTest {
     @Test
     public void initialise() throws Exception {
         victim.initialise();
-        assertEquals(ExchangeableImpl.ExchangeableState.INITIALISED, victim.getExchangeableState());
+        assertEquals(Exchangeable.ExchangeableState.INITIALISED, victim.getExchangeableState());
     }
 
     @Test
     public void preProcess() throws Exception {
         victim.preProcess();
-        assertEquals(ExchangeableImpl.ExchangeableState.PRE_PROCESSED, victim.getExchangeableState());
+        assertEquals(Exchangeable.ExchangeableState.PRE_PROCESSED, victim.getExchangeableState());
     }
 
     @Test
     public void process() throws Exception {
         victim.process();
-        assertEquals(ExchangeableImpl.ExchangeableState.PROCESSED, victim.getExchangeableState());
+        assertEquals(Exchangeable.ExchangeableState.PROCESSED, victim.getExchangeableState());
     }
 
     @Test
     public void postProcess() throws Exception {
         victim.postProcess();
-        assertEquals(ExchangeableImpl.ExchangeableState.POST_PROCESSED, victim.getExchangeableState());
+        assertEquals(Exchangeable.ExchangeableState.POST_PROCESSED, victim.getExchangeableState());
     }
 
     @Test
     public void finalise() throws Exception {
         victim.finalise();
-        assertEquals(ExchangeableImpl.ExchangeableState.FINALISED, victim.getExchangeableState());
+        assertEquals(Exchangeable.ExchangeableState.FINALISED, victim.getExchangeableState());
     }
 
     @Test
     public void validate() throws Exception {
         victim.validate();
-        assertEquals(ExchangeableImpl.ExchangeableState.VALIDATED, victim.getExchangeableState());
+        assertEquals(Exchangeable.ExchangeableState.VALIDATED, victim.getExchangeableState());
     }
 
     @Test
     public void testIsFullyMatchedAsRequested() throws Exception {
-        ExchangeableImpl exchangeable = new ExchangeableMock(victim.getRequired(), victim.getRequiredValue(),
+        Exchangeable exchangeable = new ExchangeableMock(victim.getRequired(), victim.getRequiredValue(),
                 victim.getOffered(), victim.getOfferedValue());
         boolean result = victim.isFullyMatched(exchangeable);
         assertEquals(victim + " is not matched by " + exchangeable, true, result);
@@ -83,7 +82,7 @@ public class ExchangeableTest {
     public void testIsFullyMatchedAtHigherQuantity() throws Exception {
         long extraValue = 12L;
         SimpleDecimal sd = victim.getExchangeRate().multiply(new SimpleDecimal(extraValue));
-        ExchangeableImpl exchangeable = new ExchangeableMock(victim.getRequired(),
+        Exchangeable exchangeable = new ExchangeableMock(victim.getRequired(),
                 victim.getRequiredValue() + sd.longValue(),
                 victim.getOffered(), victim.getOfferedValue() + extraValue);
         boolean result = victim.isFullyMatched(exchangeable);
@@ -94,7 +93,7 @@ public class ExchangeableTest {
     @Test
     public void testIsFullyMatchedAtBetterExchangeRate() throws Exception {
         long extraValue = 15;
-        ExchangeableImpl exchangeable = new ExchangeableMock(victim.getRequired(), victim.getRequiredValue() + extraValue,
+        Exchangeable exchangeable = new ExchangeableMock(victim.getRequired(), victim.getRequiredValue() + extraValue,
                 victim.getOffered(), victim.getOfferedValue());
         boolean result = victim.isFullyMatched(exchangeable);
         assertEquals(victim + " is not matched by " + exchangeable, true, result);
@@ -104,7 +103,7 @@ public class ExchangeableTest {
     @Test
     public void testIsFullyMatchedAtBetterExchangeRateAndHigherQuantity() throws Exception {
         long extraValue = 9;
-        ExchangeableImpl exchangeable = new ExchangeableMock(victim.getRequired(),
+        Exchangeable exchangeable = new ExchangeableMock(victim.getRequired(),
                 victim.getRequiredValue()
                         + victim.getExchangeRate().multiply(new SimpleDecimal(extraValue)).longValue(),
                 victim.getOffered(), victim.getOfferedValue() + extraValue);
@@ -116,7 +115,7 @@ public class ExchangeableTest {
     @Test
     public void testIsNotFullyMatchedAtWorseExchangeRate() throws Exception {
         long extraValue = 4;
-        ExchangeableImpl exchangeable = new ExchangeableMock(victim.getRequired(), victim.getRequiredValue() - extraValue,
+        Exchangeable exchangeable = new ExchangeableMock(victim.getRequired(), victim.getRequiredValue() - extraValue,
                 victim.getOffered(), victim.getOfferedValue());
         boolean result = victim.isFullyMatched(exchangeable);
         assertEquals(victim + " is matched by " + exchangeable, false, result);
@@ -126,7 +125,7 @@ public class ExchangeableTest {
     @Test
     public void testIsNotFullyMatchedAtLowerQuantity() throws Exception {
         long extraValue = 11;
-        ExchangeableImpl exchangeable = new ExchangeableMock(victim.getRequired(), victim.getRequiredValue() - extraValue,
+        Exchangeable exchangeable = new ExchangeableMock(victim.getRequired(), victim.getRequiredValue() - extraValue,
                 victim.getOffered(), victim.getOfferedValue());
         boolean result = victim.isFullyMatched(exchangeable);
         assertEquals(victim + " is matched by " + exchangeable, false, result);
@@ -135,7 +134,7 @@ public class ExchangeableTest {
 
     @Test
     public void testIsPartiallyMatched() throws Exception {
-        ExchangeableImpl exchangeable = new ExchangeableMock(victim.getRequired(), victim.getRequiredValue(),
+        Exchangeable exchangeable = new ExchangeableMock(victim.getRequired(), victim.getRequiredValue(),
                 victim.getOffered(), victim.getOfferedValue());
         boolean result = victim.isPartiallyMatched(exchangeable);
         assertEquals(victim + " is not PartiallyMatched by " + exchangeable, true, result);
@@ -145,7 +144,7 @@ public class ExchangeableTest {
     @Test
     public void testIsPartiallyMatched2() throws Exception {
         long extraValue = 1;
-        ExchangeableImpl exchangeable = new ExchangeableMock(victim.getRequired(), victim.getRequiredValue(),
+        Exchangeable exchangeable = new ExchangeableMock(victim.getRequired(), victim.getRequiredValue(),
                 victim.getOffered(), victim.getOfferedValue() - extraValue);
         boolean result = victim.isPartiallyMatched(exchangeable);
         assertEquals(victim + " is not PartiallyMatched by " + exchangeable, true, result);
@@ -154,7 +153,7 @@ public class ExchangeableTest {
 
     @Test
     public void testIsNotPartiallyMatched() throws Exception {
-        ExchangeableImpl exchangeable = new ExchangeableMock(toCommodity2, victim.getRequiredValue(),
+        Exchangeable exchangeable = new ExchangeableMock(toCommodity2, victim.getRequiredValue(),
                 victim.getOffered(), victim.getOfferedValue());
         boolean result = victim.isPartiallyMatched(exchangeable);
         assertEquals(victim + " is PartiallyMatched by " + exchangeable, false, result);
@@ -163,7 +162,7 @@ public class ExchangeableTest {
 
     @Test
     public void testIsNotPartiallyMatched2() throws Exception {
-        ExchangeableImpl exchangeable = new ExchangeableMock(victim.getRequired(), victim.getRequiredValue(),
+        Exchangeable exchangeable = new ExchangeableMock(victim.getRequired(), victim.getRequiredValue(),
                 fromCommodity2, victim.getOfferedValue());
         boolean result = victim.isPartiallyMatched(exchangeable);
         assertEquals(victim + " is PartiallyMatched by " + exchangeable, false, result);

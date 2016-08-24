@@ -3,8 +3,8 @@ package org.trading.exchange.publicInterfaces;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.trading.exchange.interfaces.CommodityImpl;
-import org.trading.exchange.interfaces.LocationImpl;
+import org.trading.exchange.interfaces.Commodity;
+import org.trading.exchange.interfaces.Location;
 import org.trading.exchange.interfaces.mocks.ExchangeableMock;
 import org.trading.exchange.interfaces.mocks.MarketMock;
 
@@ -15,14 +15,14 @@ import java.util.UUID;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Created by GArlington on 19/08/2016.
+ * Created by GArlington.
  */
 public class MarketTest {
     String id = UUID.randomUUID().toString();
-    Location location = LocationImpl.GLOBAL;
+    org.trading.exchange.publicInterfaces.Location location = org.trading.exchange.interfaces.Location.GLOBAL;
     String name = id;
-    CommodityImpl offered = CommodityImpl.FUEL_OIL;
-    CommodityImpl required = CommodityImpl.USD;
+    Commodity offered = Commodity.FUEL_OIL;
+    Commodity required = Commodity.USD;
     Exchangeable e1 = new ExchangeableMock(offered, 1000L, required, 1000L);
     Exchangeable e2 = new ExchangeableMock(offered, 1000L, required, 1005L);
     Collection<Exchangeable> orders;
@@ -34,7 +34,7 @@ public class MarketTest {
         orders = new ArrayList<>();
         orders.add(e1);
         orders.add(e2);
-        victim = new MarketMock(id, location, name, offered, required, orders);
+        victim = new MarketMock(id, location, name, offered, required, e1, e2);
     }
 
     @After
@@ -49,8 +49,8 @@ public class MarketTest {
 
     @Test(expected = IllegalStateException.class)
     public void validateLocationFail() {
-        Location location2 = LocationImpl.LONDON;
-        Market test = new MarketMock(id, location2, name, offered, required, orders);
+        org.trading.exchange.publicInterfaces.Location location2 = org.trading.exchange.interfaces.Location.LONDON;
+        Market test = new MarketMock(id, location2, name, offered, required, e1, e2);
         assertEquals(false, test.validateLocation());
     }
 
@@ -61,8 +61,8 @@ public class MarketTest {
 
     @Test(expected = IllegalStateException.class)
     public void validateMarketFail() throws Exception {
-        Location location = LocationImpl.ZURICH;
-        Market test = new MarketMock(id, location, name, offered, required, orders);
+        org.trading.exchange.publicInterfaces.Location location = Location.ZURICH;
+        Market test = new MarketMock(id, location, name, offered, required, e1, e2);
 
         test.validateMarket();
     }

@@ -3,14 +3,15 @@ package org.trading.exchange.interfaces;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedList;
 
-import static org.trading.exchange.interfaces.CommodityImpl.*;
+import static org.trading.exchange.interfaces.Commodity.*;
 
 /**
  * Created by GArlington.
  */
 @XmlRootElement
-public enum LocationImpl implements org.trading.exchange.publicInterfaces.Location {
+public enum Location implements org.trading.exchange.publicInterfaces.Location {
     // Metal exchange vaults
     LONDON("LON", "London vault", "Vault description", GOLD, SILVER, USD, GBP, EUR),
     ZURICH("ZUR", "Zurich vault", "Vault description", GOLD, SILVER, USD, GBP, EUR),
@@ -30,11 +31,11 @@ public enum LocationImpl implements org.trading.exchange.publicInterfaces.Locati
     private final String description;
     private final Collection<org.trading.exchange.publicInterfaces.Commodity> commodities;
 
-    LocationImpl(String code, String name, String description, org.trading.exchange.publicInterfaces.Commodity... commodities) {
+    Location(String code, String name, String description, org.trading.exchange.publicInterfaces.Commodity... commodities) {
         this.code = code;
         this.name = name;
         this.description = description;
-        this.commodities = Arrays.asList(commodities);
+        this.commodities = new LinkedList<>(Arrays.asList(commodities));
     }
 
     @Override
@@ -64,7 +65,7 @@ public enum LocationImpl implements org.trading.exchange.publicInterfaces.Locati
 
     @Override
     public String toString() {
-        return "LocationImpl{" +
+        return "Location{" +
                 "code='" + code + '\'' +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +

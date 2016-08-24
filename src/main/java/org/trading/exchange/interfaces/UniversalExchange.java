@@ -53,7 +53,7 @@ public interface UniversalExchange extends org.trading.exchange.publicInterfaces
      * Accept order
      *
      * @param exchangeable
-     * @return accepted ExchangeableImpl
+     * @return accepted Exchangeable
      * @throws IllegalStateException
      */
     @Override
@@ -65,7 +65,7 @@ public interface UniversalExchange extends org.trading.exchange.publicInterfaces
      * Process order
      *
      * @param exchangeable
-     * @return processed ExchangeableImpl
+     * @return processed Exchangeable
      */
     default Exchangeable processOrder(Exchangeable exchangeable) {
         return getStrategy().processOrder((Exchangeable) exchangeable.process(), getPlatform());
@@ -75,7 +75,7 @@ public interface UniversalExchange extends org.trading.exchange.publicInterfaces
      * PostProcess order
      *
      * @param exchangeable
-     * @return post-processed ExchangeableImpl
+     * @return post-processed Exchangeable
      */
     default Exchanged postProcessOrder(Exchangeable exchangeable) {
         return getStrategy().postProcessOrder((Exchangeable) exchangeable.postProcess(), getPlatform());
@@ -85,7 +85,7 @@ public interface UniversalExchange extends org.trading.exchange.publicInterfaces
      * Finalise order
      *
      * @param exchangeable
-     * @return finalised ExchangeableImpl
+     * @return finalised Exchangeable
      */
     default Exchanged finaliseOrder(Exchangeable exchangeable) {
         Exchangeable finalisedExchangeable = (Exchangeable) exchangeable.finalise();
@@ -197,11 +197,11 @@ public interface UniversalExchange extends org.trading.exchange.publicInterfaces
         }
 
     /*
-        default Exchanged matchOrder(ExchangeableImpl order, UniversalExchange platform) {
+        default Exchanged matchOrder(Exchangeable order, UniversalExchange platform) {
             return matchOrder(order, getMatchingOrders(order, platform), platform);
         }
 
-        default Exchanged matchOrder(ExchangeableImpl order, Collection<ExchangeableImpl> matchingOrders, UniversalExchange platform) {
+        default Exchanged matchOrder(Exchangeable order, Collection<Exchangeable> matchingOrders, UniversalExchange platform) {
             platform.m
         }
     */

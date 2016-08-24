@@ -2,30 +2,30 @@ package org.trading.exchange.publicInterfaces;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.trading.exchange.interfaces.CommodityImpl;
-import org.trading.exchange.interfaces.LocationImpl;
+import org.trading.exchange.interfaces.Commodity;
+import org.trading.exchange.interfaces.Location;
 
 import static org.junit.Assert.assertEquals;
 
 /**
- * Created by GArlington on 20/08/2016.
+ * Created by GArlington.
  */
 public class LocationTest {
-    Location victim;
+    org.trading.exchange.publicInterfaces.Location victim;
 
     @Before
     public void setup() {
-        victim = LocationImpl.LONDON;
+        victim = Location.LONDON;
     }
 
     @Test
     public void checkCommodity() throws Exception {
-        assertEquals(true, victim.checkCommodity(CommodityImpl.GOLD));
-        assertEquals(true, victim.checkCommodity(CommodityImpl.SILVER));
+        assertEquals(true, victim.checkCommodity(Commodity.GOLD));
+        assertEquals(true, victim.checkCommodity(Commodity.SILVER));
     }
 
     @Test
     public void checkCommodityFail() throws Exception {
-        assertEquals(false, victim.checkCommodity(CommodityImpl.COFFEE));
+        assertEquals(false, victim.checkCommodity(Commodity.COFFEE));
     }
 }

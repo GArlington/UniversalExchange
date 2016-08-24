@@ -7,10 +7,12 @@ import org.trading.exchange.publicInterfaces.Location;
 import org.trading.exchange.publicInterfaces.Market;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedList;
 
 /**
- * Created by GArlington on 06/08/2016.
+ * Created by GArlington.
  */
 public class UniversalExchangeMock implements UniversalExchange {
     private String name;
@@ -18,14 +20,14 @@ public class UniversalExchangeMock implements UniversalExchange {
     private Collection<Market> markets;
     private UniversalExchange platform;
 
-    public UniversalExchangeMock(String name, Strategy strategy, Collection<Market> markets) {
+    public UniversalExchangeMock(String name, Strategy strategy, Market... markets) {
         this.name = name;
         this.strategy = strategy;
-        this.markets = markets;
+        this.markets = new LinkedList<>(Arrays.asList(markets));
         this.platform = this;
     }
 
-    public UniversalExchangeMock(String name, Strategy strategy, Collection<Market> markets, UniversalExchange platform) {
+    public UniversalExchangeMock(String name, Strategy strategy, UniversalExchange platform, Market... markets) {
         this(name, strategy, markets);
         this.platform = platform;
     }
@@ -79,7 +81,7 @@ public class UniversalExchangeMock implements UniversalExchange {
 
     @Override
     public Exchangeable validateOrder(Exchangeable exchangeable, UniversalExchange platform) throws IllegalStateException {
-        return ((Exchangeable) exchangeable).validate();
+        return exchangeable.validate();
     }
 
     @Override
@@ -120,7 +122,7 @@ public class UniversalExchangeMock implements UniversalExchange {
         return "UniversalExchangeMock{" +
                 "name='" + name + '\'' +
                 ", strategy=" + strategy +
-                ", markets=" + markets +
+                ", \nmarkets=\n" + markets +
 //                ", platform=" + platform +
                 '}';
     }

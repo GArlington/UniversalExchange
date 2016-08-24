@@ -1,12 +1,12 @@
 package org.trading.exchange.interfaces.mocks;
 
-import org.trading.exchange.interfaces.ExchangeableImpl;
+import org.trading.exchange.interfaces.Exchangeable;
 import org.trading.exchange.publicInterfaces.Commodity;
 
 /**
- * Created by GArlington on 08/08/2016.
+ * Created by GArlington.
  */
-public class ExchangeableMock implements ExchangeableImpl {
+public class ExchangeableMock implements Exchangeable {
     private Commodity offered;
     private long offeredValue;
     private long originalOfferedValue;
@@ -84,18 +84,16 @@ public class ExchangeableMock implements ExchangeableImpl {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("ExchangeableMock{");
-        sb.append("offered=").append(offered);
-        sb.append(", offeredValue=").append(offeredValue);
-        sb.append(", originalOfferedValue=").append(originalOfferedValue);
-        sb.append(", matchedOfferedValue=").append(matchedOfferedValue);
-        sb.append(", required=").append(required);
-        sb.append(", requiredValue=").append(requiredValue);
-        sb.append(", originalRequiredValue=").append(originalRequiredValue);
-        sb.append(", matchedRequiredValue=").append(matchedRequiredValue);
-        sb.append(", exchangeableState=").append(exchangeableState);
-        sb.append(", processState=").append(processState);
-        sb.append('}');
-        return sb.toString();
+        return "ExchangeableMock{" + "offered=" + offered +
+                ", offeredValue=" + offeredValue +
+                ", originalOfferedValue=" + originalOfferedValue +
+                ", matchedOfferedValue=" + matchedOfferedValue +
+                ", required=" + required +
+                ", requiredValue=" + requiredValue +
+                ", originalRequiredValue=" + originalRequiredValue +
+                ", matchedRequiredValue=" + matchedRequiredValue +
+                ", exchangeableState=" + exchangeableState +
+                ", processState=" + processState +
+                '}';
     }
 }

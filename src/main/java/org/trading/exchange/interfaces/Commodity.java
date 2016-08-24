@@ -1,7 +1,5 @@
 package org.trading.exchange.interfaces;
 
-import org.trading.exchange.publicInterfaces.Commodity;
-
 import javax.xml.bind.annotation.XmlRootElement;
 
 import static org.trading.exchange.interfaces._DefaultValues.*;
@@ -10,7 +8,7 @@ import static org.trading.exchange.interfaces._DefaultValues.*;
  * Created by GArlington.
  */
 @XmlRootElement
-public enum CommodityImpl implements Commodity {
+public enum Commodity implements org.trading.exchange.publicInterfaces.Commodity {
     // Stocks and shares
     STOCKS("#STOCKS#", "#STOCKS#", "Stocks and shares", PRICED_TO_MINIMUM_ORDER_RATIO)
 
@@ -49,7 +47,7 @@ public enum CommodityImpl implements Commodity {
      *                             Gold ->
      *                             priceToQuantityRatio = 1000L)
      */
-    CommodityImpl(String id, String name, String description, long priceToQuantityRatio) {
+    Commodity(String id, String name, String description, long priceToQuantityRatio) {
         this.id = id;
         this.name = name;
         this.description = description;
