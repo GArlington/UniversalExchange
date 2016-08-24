@@ -9,7 +9,7 @@ import java.util.Collection;
  * Created by GArlington.
  */
 public interface Exchanged extends Serializable {
-    Exchangeable getExchangeable();
+	Exchangeable getExchangeable();
 
-    Collection<Exchangeable> getMatchedExchangeables();
+	Collection<Exchangeable> getMatchedExchangeables();
 }

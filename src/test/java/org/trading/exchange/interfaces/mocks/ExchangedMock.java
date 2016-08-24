@@ -9,20 +9,20 @@ import java.util.Collection;
  * Created by GArlington.
  */
 public class ExchangedMock implements Exchanged {
-    Exchangeable exchangeable;
-    Collection<Exchangeable> matchedExchangeables;
+	Exchangeable exchangeable;
+	Collection<Exchangeable> matchedExchangeables;
 
-    public ExchangedMock(Exchangeable exchangeable, Collection<Exchangeable> matchedExchangeables) {
-        this.exchangeable = exchangeable;
-        this.matchedExchangeables = matchedExchangeables;
-    }
+	public ExchangedMock(Exchangeable exchangeable, Collection<Exchangeable> matchedExchangeables) {
+		this.exchangeable = exchangeable;
+		this.matchedExchangeables = matchedExchangeables;
+	}
 
-    @Override
-    public Exchangeable getExchangeable() {
-        return exchangeable;
-    }
+	@Override
+	public Exchangeable getExchangeable() {
+		return exchangeable;
+	}
 
-    public Collection<Exchangeable> getMatchedExchangeables() {
-        return matchedExchangeables;
-    }
+	public Collection<Exchangeable> getMatchedExchangeables() {
+		return matchedExchangeables;
+	}
 }

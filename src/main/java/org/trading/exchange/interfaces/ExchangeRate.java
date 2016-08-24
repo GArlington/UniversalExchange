@@ -7,5 +7,5 @@ import org.trading.exchange.publicInterfaces.Exchangeable;
  * Created by GArlington.
  */
 public interface ExchangeRate {
-    SimpleDecimal getExchangeRate(Exchangeable from, Exchangeable to);
+	SimpleDecimal getExchangeRate(Exchangeable from, Exchangeable to);
 }
