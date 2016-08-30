@@ -135,7 +135,7 @@ public enum Commodity implements org.trading.exchange.publicInterfaces.Commodity
 
 	@Override
 	public boolean isGlobal() {
-		return false;
+		return global;
 	}
 
 	@Override

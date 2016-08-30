@@ -2,22 +2,22 @@ package org.trading.exchange.interfaces.mocks;
 
 import org.trading.exchange.publicInterfaces.Exchangeable;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
 
 /**
  * Created by GArlington.
  */
 public class CollectionOfExchangeableMock implements Collection<Exchangeable> {
-	Collection<Exchangeable> collection;
+	Collection<? extends Exchangeable> collection;
 
 	public CollectionOfExchangeableMock(Exchangeable... exchangeables) {
-		this.collection = new ArrayList<>(Arrays.asList(exchangeables));
+		this.collection = new LinkedList<>(Arrays.asList(exchangeables));
 	}
 
-	public Collection<Exchangeable> getCollection() {
+	public Collection<? extends Exchangeable> getCollection() {
 		return collection;
 	}
 
@@ -36,9 +36,10 @@ public class CollectionOfExchangeableMock implements Collection<Exchangeable> {
 		return collection.contains(o);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Iterator<Exchangeable> iterator() {
-		return collection.iterator();
+		return ((Collection<Exchangeable>) collection).iterator();
 	}
 
 	@Override
@@ -51,9 +52,10 @@ public class CollectionOfExchangeableMock implements Collection<Exchangeable> {
 		return collection.toArray(a);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean add(Exchangeable exchangeable) {
-		return collection.add(exchangeable);
+		return ((Collection<Exchangeable>) collection).add(exchangeable);
 	}
 
 	@Override
@@ -66,9 +68,10 @@ public class CollectionOfExchangeableMock implements Collection<Exchangeable> {
 		return collection.containsAll(c);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean addAll(Collection<? extends Exchangeable> c) {
-		return collection.addAll(c);
+		return ((Collection<Exchangeable>) collection).addAll(c);
 	}
 
 	@Override

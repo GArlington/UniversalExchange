@@ -10,11 +10,17 @@ import java.util.Collection;
  */
 public class ExchangedMock implements Exchanged {
 	Exchangeable exchangeable;
-	Collection<Exchangeable> matchedExchangeables;
+	Collection<? extends Exchangeable> matchedExchangeables;
 
-	public ExchangedMock(Exchangeable exchangeable, Collection<Exchangeable> matchedExchangeables) {
+	public ExchangedMock(Exchangeable exchangeable, Collection<? extends Exchangeable> matchedExchangeables) {
 		this.exchangeable = exchangeable;
+		this.exchangeable.setExchanged(this);
 		this.matchedExchangeables = matchedExchangeables;
+		if (this.matchedExchangeables != null && this.matchedExchangeables.size() > 0) {
+			for (Exchangeable ex : this.matchedExchangeables) {
+				if (ex != null) ex.setExchanged(this);
+			}
+		}
 	}
 
 	@Override
@@ -22,7 +28,7 @@ public class ExchangedMock implements Exchanged {
 		return exchangeable;
 	}
 
-	public Collection<Exchangeable> getMatchedExchangeables() {
+	public Collection<? extends Exchangeable> getMatchedExchangeables() {
 		return matchedExchangeables;
 	}
 }

@@ -7,17 +7,18 @@ import org.trading.exchange.publicInterfaces.Location;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedList;
 
 /**
  * Created by GArlington.
  */
 public class MarketMock implements Market {
+	private final Collection<? extends Exchangeable> orders;
 	private String id;
 	private Location location;
 	private String name;
 	private Commodity offered;
 	private Commodity required;
-	private Collection<Exchangeable> orders;
 
 	public MarketMock(String id, Location location, String name, Commodity offered, Commodity required,
 					  Exchangeable... orders) {
@@ -26,7 +27,7 @@ public class MarketMock implements Market {
 		this.name = name;
 		this.offered = offered;
 		this.required = required;
-		this.orders = Arrays.asList(orders);
+		this.orders = new LinkedList<>(Arrays.asList(orders));
 		validateMarket();
 	}
 
@@ -56,8 +57,15 @@ public class MarketMock implements Market {
 	}
 
 	@Override
-	public Collection<Exchangeable> getOrders() {
+	public Collection<? extends Exchangeable> getOrders() {
 		return orders;
+	}
+
+	@Override
+	public boolean addOrder(Exchangeable exchangeable) {
+		synchronized (orders) {
+			return ((Collection<Exchangeable>) orders).add(exchangeable);
+		}
 	}
 
 	@Override
@@ -68,7 +76,8 @@ public class MarketMock implements Market {
 				", \noffered=" + offered +
 				", \nrequired=" + required +
 				", \nlocation=" + location +
-				", \norders=\n" + orders +
-				'}' + '\n';
+				", \norders=\n" + getOrders() +
+				", \nOPEN orders=\n" + getOrders(Exchangeable.State.OPEN) +
+				'}' + '\n' + '\n';
 	}
 }

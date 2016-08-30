@@ -1,6 +1,7 @@
 package org.trading.exchange.interfaces;
 
 import org.trading.exchange.publicInterfaces.Exchangeable;
+import org.trading.exchange.publicInterfaces.Exchanged;
 import org.trading.exchange.publicInterfaces.Market;
 
 import java.util.Collection;
@@ -68,8 +69,20 @@ public interface UniversalExchange extends org.trading.exchange.publicInterfaces
 	 * @return
 	 */
 	@Override
-	default Collection<Exchangeable> getMatchingOrders(Exchangeable exchangeable) {
+	default Collection<? extends Exchangeable> getMatchingOrders(Exchangeable exchangeable) {
 		return getStrategy().getMatchingOrders(exchangeable, getPlatform());
+	}
+
+	/**
+	 * Process order with matched orders
+	 *
+	 * @param exchangeable
+	 * @param matchingOrders
+	 * @return
+	 */
+	@Override
+	default Exchanged matchOrder(Exchangeable exchangeable, Collection<? extends Exchangeable> matchingOrders) {
+		return getStrategy().matchOrder(exchangeable, matchingOrders, getPlatform());
 	}
 
 	/**
@@ -147,7 +160,8 @@ public interface UniversalExchange extends org.trading.exchange.publicInterfaces
 	 * @param platform
 	 * @return
 	 */
-	Exchangeable processOrder(Exchangeable exchangeable, Collection<Exchangeable> orders, UniversalExchange platform);
+	Exchangeable processOrder(Exchangeable exchangeable, Collection<? extends Exchangeable> orders, UniversalExchange
+			platform);
 
 	/**
 	 * PostProcess order implementation
@@ -174,7 +188,19 @@ public interface UniversalExchange extends org.trading.exchange.publicInterfaces
 	 * @param platform
 	 * @return
 	 */
-	Collection<Exchangeable> getMatchingOrders(Exchangeable exchangeable, UniversalExchange platform);
+	Collection<? extends Exchangeable> getMatchingOrders(Exchangeable exchangeable, UniversalExchange platform);
+
+
+	/**
+	 * Process order with matched orders implementation
+	 *
+	 * @param exchangeable
+	 * @param matchingOrders
+	 * @param platform
+	 * @return
+	 */
+	Exchanged matchOrder(Exchangeable exchangeable, Collection<? extends Exchangeable> matchingOrders,
+						 UniversalExchange platform);
 
 	/**
 	 * Default strategy is to pass all functionality directly to platform specific implementation
@@ -197,24 +223,18 @@ public interface UniversalExchange extends org.trading.exchange.publicInterfaces
 			return platform.acceptOrder(order, platform);
 		}
 
-    /*
-		default Exchanged matchOrder(Exchangeable order, UniversalExchange platform) {
-            return matchOrder(order, getMatchingOrders(order, platform), platform);
-        }
-
-        default Exchanged matchOrder(Exchangeable order, Collection<Exchangeable> matchingOrders, UniversalExchange
-        platform) {
-            platform.m
-        }
-    */
+		default Exchanged matchOrder(Exchangeable order, Collection<? extends Exchangeable> matchingOrders,
+									 UniversalExchange platform) {
+			return platform.matchOrder(order, matchingOrders, platform);
+		}
 
 		default Exchangeable processOrder(Exchangeable exchangeable, UniversalExchange platform) {
 			return processOrder(exchangeable, getMatchingOrders(exchangeable, platform), platform);
 		}
 
-		default Exchangeable processOrder(Exchangeable exchangeable, Collection<Exchangeable> orders,
+		default Exchangeable processOrder(Exchangeable exchangeable, Collection<? extends Exchangeable> matchingOrders,
 										  UniversalExchange platform) {
-			return platform.processOrder(exchangeable, orders, platform);
+			return platform.processOrder(exchangeable, matchingOrders, platform);
 		}
 
 		default Exchanged postProcessOrder(Exchangeable exchangeable, UniversalExchange platform) {
@@ -225,11 +245,7 @@ public interface UniversalExchange extends org.trading.exchange.publicInterfaces
 			return platform.finaliseOrder((Exchangeable) exchangeable.finalise(), platform);
 		}
 
-		default Collection<Exchangeable> getMatchingOrders(Exchangeable order, UniversalExchange platform) {
-			return platform.getMatchingOrders(order, platform);
-		}
-
-		default Collection<Exchangeable> getChainedMatchingOrders(Exchangeable order, UniversalExchange platform) {
+		default Collection<? extends Exchangeable> getMatchingOrders(Exchangeable order, UniversalExchange platform) {
 			return platform.getMatchingOrders(order, platform);
 		}
 	}

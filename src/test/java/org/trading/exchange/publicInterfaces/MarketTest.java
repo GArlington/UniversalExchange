@@ -44,7 +44,7 @@ public class MarketTest {
 
 	@Test
 	public void validateLocation() {
-		victim.validateLocation();
+		assertEquals(true, victim.validateLocation());
 	}
 
 	@Test(expected = IllegalStateException.class)
@@ -56,7 +56,7 @@ public class MarketTest {
 
 	@Test
 	public void validateMarket() throws Exception {
-		victim.validateMarket();
+		assertEquals(true, victim.validateMarket());
 	}
 
 	@Test(expected = IllegalStateException.class)
