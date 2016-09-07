@@ -56,7 +56,7 @@ public class MarketTest {
 
 	@Test
 	public void validateMarket() throws Exception {
-		assertEquals(true, victim.validateMarket());
+		assertEquals(true, victim.validate());
 	}
 
 	@Test(expected = IllegalStateException.class)
@@ -64,6 +64,6 @@ public class MarketTest {
 		org.trading.exchange.publicInterfaces.Location location = Location.ZURICH;
 		Market test = new MarketMock(id, location, name, offered, required, e1, e2);
 
-		test.validateMarket();
+		test.validate();
 	}
 }

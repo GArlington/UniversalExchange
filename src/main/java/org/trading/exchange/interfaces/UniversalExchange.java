@@ -4,6 +4,7 @@ import org.trading.exchange.publicInterfaces.Exchangeable;
 import org.trading.exchange.publicInterfaces.Exchanged;
 import org.trading.exchange.publicInterfaces.Market;
 
+import java.security.InvalidParameterException;
 import java.util.Collection;
 
 /**
@@ -12,109 +13,92 @@ import java.util.Collection;
  * Created by GArlington.
  */
 public interface UniversalExchange extends org.trading.exchange.publicInterfaces.UniversalExchange {
+//	SSOTokenManager ssoManager = SSOTokenManager.getInstance();
+
+/*
+	BusinessLogic getBusinessLogic();
+*/
+
+	@Override
+	default Market validate(Market market) throws InvalidParameterException {
+		return getStrategy().validate(market, getPlatform());
+	}
+
+	@Override
+	default Market open(Market market) throws IllegalStateException, InvalidParameterException {
+		return getStrategy().open(market, getPlatform());
+	}
+
+	@Override
+	default boolean close(Market market) throws IllegalStateException {
+		return getStrategy().close(market, getPlatform());
+	}
+
+	@Override
+	default Exchangeable validate(Exchangeable exchangeable) throws InvalidParameterException {
+		return getStrategy().validate(exchangeable, getPlatform());
+	}
+
+	@Override
+	default Exchangeable accept(Exchangeable exchangeable) throws InvalidParameterException {
+		validate(exchangeable);
+		return getStrategy().accept((Exchangeable) exchangeable.preProcess(), getPlatform());
+	}
+
+	@Override
+	default Collection<? extends Exchangeable> getMatching(Exchangeable exchangeable) {
+		return getStrategy().getMatching(exchangeable, getPlatform());
+	}
+
+	@Override
+	default Exchanged match(Exchangeable exchangeable, Collection<? extends Exchangeable> matchingOrders) {
+		return getStrategy().match(exchangeable, matchingOrders, getPlatform());
+	}
+
 	Strategy getStrategy();
 
 	UniversalExchange getPlatform();
 
 	/**
-	 * Open market
-	 *
-	 * @param market
-	 * @return
-	 */
-	@Override
-	default Market openMarket(Market market) {
-		return getStrategy().openMarket(market, getPlatform());
-	}
-
-	/**
-	 * Create new market
-	 *
-	 * @param market
-	 * @return
-	 */
-	@Override
-	default Market closeMarket(Market market) {
-		return getStrategy().closeMarket(market, getPlatform());
-	}
-
-	/**
-	 * Validate order
-	 *
-	 * @param exchangeable
-	 * @return validated Exchangeable
-	 * @throws IllegalStateException
-	 */
-	@Override
-	default Exchangeable validateOrder(Exchangeable exchangeable) throws IllegalStateException {
-		return getStrategy().validateOrder(exchangeable, getPlatform());
-	}
-
-	/**
-	 * Accept order
-	 *
-	 * @param exchangeable
-	 * @return accepted Exchangeable
-	 * @throws IllegalStateException
-	 */
-	@Override
-	default Exchangeable acceptOrder(Exchangeable exchangeable) throws IllegalStateException {
-		return getStrategy().acceptOrder((Exchangeable) validateOrder(exchangeable).preProcess(), getPlatform());
-	}
-
-	/**
-	 * Get matching orders
-	 *
-	 * @param exchangeable
-	 * @return
-	 */
-	@Override
-	default Collection<? extends Exchangeable> getMatchingOrders(Exchangeable exchangeable) {
-		return getStrategy().getMatchingOrders(exchangeable, getPlatform());
-	}
-
-	/**
-	 * Process order with matched orders
-	 *
-	 * @param exchangeable
-	 * @param matchingOrders
-	 * @return
-	 */
-	@Override
-	default Exchanged matchOrder(Exchangeable exchangeable, Collection<? extends Exchangeable> matchingOrders) {
-		return getStrategy().matchOrder(exchangeable, matchingOrders, getPlatform());
-	}
-
-	/**
-	 * Process order
+	 * Process Exchangeable
 	 *
 	 * @param exchangeable
 	 * @return processed Exchangeable
 	 */
-	default Exchangeable processOrder(Exchangeable exchangeable) {
-		return getStrategy().processOrder((Exchangeable) exchangeable.process(), getPlatform());
+	default Exchangeable process(Exchangeable exchangeable) {
+		return getStrategy().process((Exchangeable) exchangeable.process(), getPlatform());
 	}
 
 	/**
-	 * PostProcess order
+	 * PostProcess Exchangeable
 	 *
 	 * @param exchangeable
 	 * @return post-processed Exchangeable
 	 */
-	default Exchanged postProcessOrder(Exchangeable exchangeable) {
-		return getStrategy().postProcessOrder((Exchangeable) exchangeable.postProcess(), getPlatform());
+	default Exchanged postProcess(Exchangeable exchangeable) {
+		return getStrategy().postProcess((Exchangeable) exchangeable.postProcess(), getPlatform());
 	}
 
 	/**
-	 * Finalise order
+	 * Finalise Exchangeable
 	 *
 	 * @param exchangeable
 	 * @return finalised Exchangeable
 	 */
-	default Exchanged finaliseOrder(Exchangeable exchangeable) {
+	default Exchanged finalise(Exchangeable exchangeable) {
 		Exchangeable finalisedExchangeable = (Exchangeable) exchangeable.finalise();
-		return getStrategy().finaliseOrder(finalisedExchangeable, getPlatform());
+		return getStrategy().finalise(finalisedExchangeable, getPlatform());
 	}
+
+
+	/**
+	 * Validate Market implementation
+	 *
+	 * @param market
+	 * @param platform
+	 * @return
+	 */
+	Market validate(Market market, UniversalExchange platform);
 
 	/**
 	 * Open market implementation
@@ -122,7 +106,8 @@ public interface UniversalExchange extends org.trading.exchange.publicInterfaces
 	 * @param market
 	 * @return
 	 */
-	Market openMarket(Market market, UniversalExchange platform);
+	Market open(Market market, UniversalExchange platform)
+			throws IllegalStateException, InvalidParameterException;
 
 	/**
 	 * Close market implementation
@@ -130,56 +115,56 @@ public interface UniversalExchange extends org.trading.exchange.publicInterfaces
 	 * @param market
 	 * @return
 	 */
-	Market closeMarket(Market market, UniversalExchange platform);
+	boolean close(Market market, UniversalExchange platform);
 
 	/**
-	 * Validate order implementation
+	 * Validate Exchangeable implementation
 	 *
 	 * @param exchangeable
 	 * @param platform
 	 * @return
 	 * @throws IllegalStateException
 	 */
-	Exchangeable validateOrder(Exchangeable exchangeable, UniversalExchange platform) throws IllegalStateException;
+	Exchangeable validate(Exchangeable exchangeable, UniversalExchange platform) throws IllegalStateException;
 
 	/**
-	 * Accept order implementation
+	 * Accept Exchangeable implementation
 	 *
 	 * @param exchangeable
 	 * @param platform
 	 * @return
 	 * @throws IllegalStateException
 	 */
-	Exchangeable acceptOrder(Exchangeable exchangeable, UniversalExchange platform) throws IllegalStateException;
+	Exchangeable accept(Exchangeable exchangeable, UniversalExchange platform) throws IllegalStateException;
 
 	/**
-	 * Process order implementation
+	 * Process Exchangeable implementation
 	 *
 	 * @param exchangeable
-	 * @param orders
+	 * @param matching
 	 * @param platform
 	 * @return
 	 */
-	Exchangeable processOrder(Exchangeable exchangeable, Collection<? extends Exchangeable> orders, UniversalExchange
+	Exchangeable process(Exchangeable exchangeable, Collection<? extends Exchangeable> matching, UniversalExchange
 			platform);
 
 	/**
-	 * PostProcess order implementation
+	 * PostProcess Exchangeable implementation
 	 *
 	 * @param exchangeable
 	 * @param platform
 	 * @return
 	 */
-	Exchanged postProcessOrder(Exchangeable exchangeable, UniversalExchange platform);
+	Exchanged postProcess(Exchangeable exchangeable, UniversalExchange platform);
 
 	/**
-	 * Finalise order implementation
+	 * Finalise Exchangeable implementation
 	 *
 	 * @param exchangeable
 	 * @param platform
 	 * @return
 	 */
-	Exchanged finaliseOrder(Exchangeable exchangeable, UniversalExchange platform);
+	Exchanged finalise(Exchangeable exchangeable, UniversalExchange platform);
 
 	/**
 	 * Get matching orders implementation
@@ -188,65 +173,70 @@ public interface UniversalExchange extends org.trading.exchange.publicInterfaces
 	 * @param platform
 	 * @return
 	 */
-	Collection<? extends Exchangeable> getMatchingOrders(Exchangeable exchangeable, UniversalExchange platform);
+	Collection<? extends Exchangeable> getMatching(Exchangeable exchangeable, UniversalExchange platform);
 
 
 	/**
-	 * Process order with matched orders implementation
+	 * Process Exchangeable with matched orders implementation
 	 *
 	 * @param exchangeable
 	 * @param matchingOrders
 	 * @param platform
 	 * @return
 	 */
-	Exchanged matchOrder(Exchangeable exchangeable, Collection<? extends Exchangeable> matchingOrders,
-						 UniversalExchange platform);
+	Exchanged match(Exchangeable exchangeable, Collection<? extends Exchangeable> matchingOrders,
+					UniversalExchange platform);
 
 	/**
 	 * Default strategy is to pass all functionality directly to platform specific implementation
 	 */
 	interface Strategy {
-		default Market openMarket(Market market, UniversalExchange platform) {
-			return platform.openMarket(market, platform);
+		default Market validate(Market market, UniversalExchange platform)
+				throws InvalidParameterException {
+			return platform.validate(market, platform);
 		}
 
-		default Market closeMarket(Market market, UniversalExchange platform) {
-			return platform.closeMarket(market, platform);
+		default Market open(Market market, UniversalExchange platform) {
+			return platform.open(market, platform);
 		}
 
-		default Exchangeable validateOrder(Exchangeable exchangeable, UniversalExchange platform)
+		default boolean close(Market market, UniversalExchange platform) {
+			return platform.close(market, platform);
+		}
+
+		default Exchangeable validate(Exchangeable exchangeable, UniversalExchange platform)
 				throws IllegalStateException {
-			return platform.validateOrder(exchangeable, platform);
+			return platform.validate(exchangeable, platform);
 		}
 
-		default Exchangeable acceptOrder(Exchangeable order, UniversalExchange platform) {
-			return platform.acceptOrder(order, platform);
+		default Exchangeable accept(Exchangeable exchangeable, UniversalExchange platform) {
+			return platform.accept(exchangeable, platform);
 		}
 
-		default Exchanged matchOrder(Exchangeable order, Collection<? extends Exchangeable> matchingOrders,
+		default Exchanged match(Exchangeable exchangeable, Collection<? extends Exchangeable> matching,
+								UniversalExchange platform) {
+			return platform.match(exchangeable, matching, platform);
+		}
+
+		default Exchangeable process(Exchangeable exchangeable, UniversalExchange platform) {
+			return process(exchangeable, getMatching(exchangeable, platform), platform);
+		}
+
+		default Exchangeable process(Exchangeable exchangeable, Collection<? extends Exchangeable> matching,
 									 UniversalExchange platform) {
-			return platform.matchOrder(order, matchingOrders, platform);
+			return platform.process(exchangeable, matching, platform);
 		}
 
-		default Exchangeable processOrder(Exchangeable exchangeable, UniversalExchange platform) {
-			return processOrder(exchangeable, getMatchingOrders(exchangeable, platform), platform);
+		default Exchanged postProcess(Exchangeable exchangeable, UniversalExchange platform) {
+			return platform.postProcess((Exchangeable) exchangeable.postProcess(), platform);
 		}
 
-		default Exchangeable processOrder(Exchangeable exchangeable, Collection<? extends Exchangeable> matchingOrders,
-										  UniversalExchange platform) {
-			return platform.processOrder(exchangeable, matchingOrders, platform);
+		default Exchanged finalise(Exchangeable exchangeable, UniversalExchange platform) {
+			return platform.finalise((Exchangeable) exchangeable.finalise(), platform);
 		}
 
-		default Exchanged postProcessOrder(Exchangeable exchangeable, UniversalExchange platform) {
-			return platform.postProcessOrder((Exchangeable) exchangeable.postProcess(), platform);
-		}
-
-		default Exchanged finaliseOrder(Exchangeable exchangeable, UniversalExchange platform) {
-			return platform.finaliseOrder((Exchangeable) exchangeable.finalise(), platform);
-		}
-
-		default Collection<? extends Exchangeable> getMatchingOrders(Exchangeable order, UniversalExchange platform) {
-			return platform.getMatchingOrders(order, platform);
+		default Collection<? extends Exchangeable> getMatching(Exchangeable exchangeable, UniversalExchange platform) {
+			return platform.getMatching(exchangeable, platform);
 		}
 	}
 }

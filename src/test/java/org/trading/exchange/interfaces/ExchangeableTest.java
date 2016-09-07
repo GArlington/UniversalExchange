@@ -25,7 +25,8 @@ public class ExchangeableTest {
 
 	@Before
 	public void setUp() throws Exception {
-		victim = new ExchangeableMock(fromCommodity, fromValue, toCommodity, toValue);
+		victim = ExchangeableMock.getBuilder().setOffered(fromCommodity).setOfferedValue(fromValue)
+				.setRequired(toCommodity).setRequiredValue(toValue).build();
 	}
 
 	@After

@@ -5,27 +5,11 @@ import org.processing.PostProcessable;
 import org.processing.PreProcessable;
 import org.processing.Processable;
 
-import java.io.Serializable;
-
 /**
  * Created by GArlington.
  */
 public interface Exchangeable extends org.trading.exchange.publicInterfaces.Exchangeable {
-	@Override
-	default Exchangeable validate() throws IllegalStateException {
-		setExchangeableState(State.VALIDATED);
-		return this;
-	}
-
-	@Override
-	default boolean isFullyMatched() {
-		return (getOfferedValue() <= 0 || getRequiredValue() <= 0);
-	}
-
-	@Override
-	default Exchangeable match(org.trading.exchange.publicInterfaces.Exchangeable exchangeableFor) {
-		return match((Exchangeable) exchangeableFor);
-	}
+	Object getLock();
 
 	/**
 	 * Match offered value
@@ -55,30 +39,45 @@ public interface Exchangeable extends org.trading.exchange.publicInterfaces.Exch
 	 */
 	SimpleDecimal getInverseExchangeRate();
 
+	@Override
+	default Exchangeable validate() throws IllegalStateException {
+		org.trading.exchange.publicInterfaces.Exchangeable.validate(this);
+		return this;
+	}
+
+	@Override
+	default boolean isFullyMatched() {
+		return (getOfferedValue() <= 0 || getRequiredValue() <= 0);
+	}
+
+	@Override
+	default Exchangeable match(org.trading.exchange.publicInterfaces.Exchangeable exchangeable) {
+		return match((Exchangeable) exchangeable);
+	}
+
 	/**
 	 * Check if this Exchangeable is fully matched (satisfied) by the Exchangeable passed as parameter
 	 *
-	 * @param exchangeableFor
+	 * @param exchangeable
 	 * @return
 	 */
-	default boolean isFullyMatched(Exchangeable exchangeableFor) {
-		return (isPartiallyMatched(exchangeableFor)
-				&& getOfferedValue() <= exchangeableFor.getRequiredValue()
-				&& getRequiredValue() <= exchangeableFor.getOfferedValue()
+	default boolean isFullyMatched(Exchangeable exchangeable) {
+		return (isPartiallyMatched(exchangeable) && getOfferedValue() <= exchangeable.getRequiredValue()
+				// TODO - this check may be redundant
+				&& getRequiredValue() <= exchangeable.getOfferedValue()
 		);
 	}
 
 	/**
 	 * Check if this Exchangeable is partially matched by the Exchangeable passed as parameter
 	 *
-	 * @param exchangeableFor
+	 * @param exchangeable
 	 * @return
 	 */
-	default boolean isPartiallyMatched(Exchangeable exchangeableFor) {
-		return (!State.OPEN.precedes(exchangeableFor.getExchangeableState())
-				&& getOffered().equals(exchangeableFor.getRequired())
-				&& getRequired().equals(exchangeableFor.getOffered())
-				&& getExchangeRate().compareTo(exchangeableFor.getInverseExchangeRate()) <= 0
+	default boolean isPartiallyMatched(Exchangeable exchangeable) {
+		return (!State.OPEN.precedes(exchangeable.getExchangeableState())
+				&& getOffered().equals(exchangeable.getRequired()) && getRequired().equals(exchangeable.getOffered())
+				&& getExchangeRate().compareTo(exchangeable.getInverseExchangeRate()) <= 0
 		);
 	}
 
@@ -87,22 +86,22 @@ public interface Exchangeable extends org.trading.exchange.publicInterfaces.Exch
 	 *
 	 * This method will change both this Exchangeable and Exchangeable passed as parameter if they match
 	 *
-	 * @param exchangeableFor
+	 * @param exchangeable
 	 * @return processed Exchangeable that was passed as parameter
 	 */
-	default Exchangeable match(Exchangeable exchangeableFor) {
-		if (isPartiallyMatched(exchangeableFor)) {
+	default Exchangeable match(Exchangeable exchangeable) {
+		if (isPartiallyMatched(exchangeable)) {
 			if (!State.OPEN.precedes(getExchangeableState())) {
-				synchronized (this) {
+				synchronized (getLock()) {
 					if (!State.OPEN.precedes(getExchangeableState())) {
-						if (!State.OPEN.precedes(exchangeableFor.getExchangeableState())) {
-							synchronized (exchangeableFor) {
-								if (!State.OPEN.precedes(exchangeableFor.getExchangeableState())) {
-									long oValue = Math.min(getOfferedValue(), exchangeableFor.getRequiredValue());
-									long rValue = exchangeableFor.getInverseExchangeRate()
+						if (!State.OPEN.precedes(exchangeable.getExchangeableState())) {
+							synchronized (exchangeable.getLock()) {
+								if (!State.OPEN.precedes(exchangeable.getExchangeableState())) {
+									long oValue = Math.min(getOfferedValue(), exchangeable.getRequiredValue());
+									long rValue = exchangeable.getInverseExchangeRate()
 											.multiply(new SimpleDecimal(oValue)).longValue(true);
 									processAndFinaliseExchangeable(this, oValue, rValue);
-									return processAndFinaliseExchangeable(exchangeableFor, rValue, oValue);
+									return processAndFinaliseExchangeable(exchangeable, rValue, oValue);
 								}
 							}
 						}
@@ -168,6 +167,7 @@ public interface Exchangeable extends org.trading.exchange.publicInterfaces.Exch
 	default int getExchangeRatePrecision() {
 		return 7;
 	}
+/*
 
 	enum ExchangeableAction implements Serializable {
 		BID("Buy", "B"),
@@ -193,4 +193,5 @@ public interface Exchangeable extends org.trading.exchange.publicInterfaces.Exch
 			return this == BID ? OFFER : BID;
 		}
 	}
+*/
 }

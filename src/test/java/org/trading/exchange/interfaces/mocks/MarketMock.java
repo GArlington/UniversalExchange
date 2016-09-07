@@ -5,7 +5,6 @@ import org.trading.exchange.publicInterfaces.Commodity;
 import org.trading.exchange.publicInterfaces.Exchangeable;
 import org.trading.exchange.publicInterfaces.Location;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -13,7 +12,7 @@ import java.util.LinkedList;
  * Created by GArlington.
  */
 public class MarketMock implements Market {
-	private final Collection<? extends Exchangeable> orders;
+	private final Collection<? extends Exchangeable> orders = new LinkedList<>();
 	private String id;
 	private Location location;
 	private String name;
@@ -27,8 +26,10 @@ public class MarketMock implements Market {
 		this.name = name;
 		this.offered = offered;
 		this.required = required;
-		this.orders = new LinkedList<>(Arrays.asList(orders));
-		validateMarket();
+		for (Exchangeable exchangeable : orders) {
+			accept(exchangeable);
+		}
+		validate();
 	}
 
 	@Override
@@ -37,13 +38,13 @@ public class MarketMock implements Market {
 	}
 
 	@Override
-	public Location getLocation() {
-		return location;
+	public String getName() {
+		return name;
 	}
 
 	@Override
-	public String getName() {
-		return name;
+	public Location getLocation() {
+		return location;
 	}
 
 	@Override
@@ -62,10 +63,18 @@ public class MarketMock implements Market {
 	}
 
 	@Override
-	public boolean addOrder(Exchangeable exchangeable) {
-		synchronized (orders) {
-			return ((Collection<Exchangeable>) orders).add(exchangeable);
+	public boolean accept(Exchangeable exchangeable) {
+		if (validate(exchangeable)) {
+			synchronized (orders) {
+				return ((Collection<Exchangeable>) orders)
+						.add(((org.trading.exchange.interfaces.Exchangeable) exchangeable).open());
+			}
 		}
+		return false;
+	}
+
+	public Builder<Market> getBuilder() {
+		return new Builder<>();
 	}
 
 	@Override
@@ -79,5 +88,49 @@ public class MarketMock implements Market {
 				", \norders=\n" + getOrders() +
 				", \nOPEN orders=\n" + getOrders(Exchangeable.State.OPEN) +
 				'}' + '\n' + '\n';
+	}
+
+	class Builder<T> implements org.trading.exchange.publicInterfaces.Market.Builder {
+		private Collection<? extends Exchangeable> orders;
+		private String id;
+		private Location location;
+		private String name;
+		private Commodity offered;
+		private Commodity required;
+
+		@Override
+		public Builder<T> setId(String s) {
+			this.id = s;
+			return this;
+		}
+
+		@Override
+		public Builder<T> setName(String s) {
+			this.name = s;
+			return this;
+		}
+
+		@Override
+		public Builder<T> setLocation(Location location) {
+			this.location = location;
+			return this;
+		}
+
+		@Override
+		public Builder<T> setOffered(Commodity commodity) {
+			this.offered = commodity;
+			return this;
+		}
+
+		@Override
+		public Builder<T> setRequired(Commodity commodity) {
+			this.required = commodity;
+			return this;
+		}
+
+		@Override
+		public Object build() {
+			return new MarketMock(id, location, name, offered, required);
+		}
 	}
 }

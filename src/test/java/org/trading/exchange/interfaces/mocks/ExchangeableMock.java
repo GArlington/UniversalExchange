@@ -10,6 +10,7 @@ import org.trading.exchange.publicInterfaces.Exchanged;
  * Created by GArlington.
  */
 public class ExchangeableMock implements Exchangeable {
+	private final Object LOCK = new Object();
 	private final Commodity offered;
 	private final long originalOfferedValue;
 	private final Commodity required;
@@ -24,8 +25,9 @@ public class ExchangeableMock implements Exchangeable {
 	private Processable.State processState = Processable.State.INITIALISED;
 	private Exchanged exchanged;
 
-	public ExchangeableMock(org.trading.exchange.publicInterfaces.Exchangeable obj) {
-		this(obj.getOffered(), obj.getOfferedValue(), obj.getRequired(), obj.getRequiredValue());
+	public ExchangeableMock(org.trading.exchange.publicInterfaces.Exchangeable exchangeable) {
+		this(exchangeable.getOffered(), exchangeable.getOfferedValue(), exchangeable.getRequired(),
+				exchangeable.getRequiredValue());
 	}
 
 	public ExchangeableMock(Commodity offered, long offeredValue, Commodity required, long requiredValue) {
@@ -40,6 +42,10 @@ public class ExchangeableMock implements Exchangeable {
 				new SimpleDecimal(getOriginalOfferedValue()).incFractionalPrecision(getExchangeRatePrecision())
 						.divide(new SimpleDecimal(getOriginalRequiredValue()));
 		initialise();
+	}
+
+	public static Builder<Exchangeable> getBuilder() {
+		return new Builder<>();
 	}
 
 	@Override
@@ -84,28 +90,6 @@ public class ExchangeableMock implements Exchangeable {
 		}
 	}
 
-	@Override
-	public void matchOfferedValue(long matchedValue) {
-		this.offeredValue -= matchedValue;
-		this.matchedOfferedValue += matchedValue;
-	}
-
-	@Override
-	public void matchRequiredValue(long matchedValue) {
-		this.requiredValue -= matchedValue;
-		this.matchedRequiredValue += matchedValue;
-	}
-
-	@Override
-	public SimpleDecimal getExchangeRate() {
-		return exchangeRate;
-	}
-
-	@Override
-	public SimpleDecimal getInverseExchangeRate() {
-		return inverseExchangeRate;
-	}
-
 	public long getOriginalOfferedValue() {
 		return originalOfferedValue;
 	}
@@ -148,5 +132,68 @@ public class ExchangeableMock implements Exchangeable {
 				", originalRequiredValue=" + originalRequiredValue +
 				", matchedRequiredValue=" + matchedRequiredValue +
 				'}' + '\n';
+	}
+
+	@Override
+	public Object getLock() {
+		return LOCK;
+	}
+
+	@Override
+	public void matchOfferedValue(long matchedValue) {
+		this.offeredValue -= matchedValue;
+		this.matchedOfferedValue += matchedValue;
+	}
+
+	@Override
+	public void matchRequiredValue(long matchedValue) {
+		this.requiredValue -= matchedValue;
+		this.matchedRequiredValue += matchedValue;
+	}
+
+	@Override
+	public SimpleDecimal getExchangeRate() {
+		return exchangeRate;
+	}
+
+	@Override
+	public SimpleDecimal getInverseExchangeRate() {
+		return inverseExchangeRate;
+	}
+
+	public static class Builder<T> implements org.trading.exchange.publicInterfaces.Exchangeable.Builder {
+		private Commodity offered;
+		private Commodity required;
+		private long offeredValue;
+		private long requiredValue;
+
+		@Override
+		public Builder<T> setOffered(Commodity offered) {
+			this.offered = offered;
+			return this;
+		}
+
+		@Override
+		public Builder<T> setOfferedValue(long offeredValue) {
+			this.offeredValue = offeredValue;
+			return this;
+		}
+
+		@Override
+		public Builder<T> setRequired(Commodity required) {
+			this.required = required;
+			return this;
+		}
+
+		@Override
+		public Builder<T> setRequiredValue(long requiredValue) {
+			this.requiredValue = requiredValue;
+			return this;
+		}
+
+		@Override
+		public Exchangeable build() {
+			return new ExchangeableMock(offered, offeredValue, required, requiredValue);
+		}
 	}
 }

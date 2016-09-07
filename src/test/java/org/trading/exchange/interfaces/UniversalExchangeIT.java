@@ -45,32 +45,32 @@ public class UniversalExchangeIT {
 	public void openMarket() throws Exception {
 		Market market = mock(Market.class);
 
-		Market result = victim.openMarket(market);
+		Market result = victim.open(market);
 		assertEquals(market, result);
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void openMarketFail() throws Exception {
 		Market market = mock(Market.class);
-		Market result = victim.openMarket(market);
+		Market result = victim.open(market);
 
-		result = victim.openMarket(market);
+		result = victim.open(market);
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void closeMarketFail() throws Exception {
 		Market market = mock(Market.class);
 
-		Market result = victim.closeMarket(market);
+		victim.close(market);
 	}
 
 	@Test
 	public void closeMarket() throws Exception {
 		Market market = mock(Market.class);
-		Market result = victim.openMarket(market);
+		Market result = victim.open(market);
 
-		result = victim.closeMarket(market);
-		assertEquals(market, result);
+		boolean bResult = victim.close(market);
+		assertEquals(true, bResult);
 	}
 
 	@Test
@@ -78,18 +78,26 @@ public class UniversalExchangeIT {
 		Exchangeable order = mock(Exchangeable.class);
 		doReturn(order).when(order).validate();
 
-		Exchangeable result = victim.validateOrder(order);
+		Exchangeable result = victim.validate(order);
 		assertEquals(order, result);
 	}
 
 	@Test
 	public void acceptOrder() throws Exception {
-		org.trading.exchange.interfaces.Exchangeable order = mock(org.trading.exchange.interfaces.Exchangeable.class);
-		doReturn(order).when(order).validate();
-		doReturn(order).when(order).preProcess();
+		org.trading.exchange.interfaces.Exchangeable exchangeable =
+				mock(org.trading.exchange.interfaces.Exchangeable.class);
+		doReturn(exchangeable).when(exchangeable).validate();
+		doReturn(exchangeable).when(exchangeable).preProcess();
+		doReturn(exchangeable).when(exchangeable).open();
+		doReturn(offered).when(exchangeable).getOffered();
+		doReturn(required).when(exchangeable).getRequired();
+		Market market = mock(org.trading.exchange.interfaces.Market.class);
+		doReturn(true).when(market).validate(exchangeable);
+		doReturn(true).when(market).accept(exchangeable);
+		victim.open(market);
 
-		Exchangeable result = victim.acceptOrder(order);
-		assertEquals(order, result);
+		Exchangeable result = victim.accept(exchangeable);
+		assertEquals(exchangeable, result);
 	}
 
 	@Test
@@ -99,7 +107,7 @@ public class UniversalExchangeIT {
 		matchedMarket = createMarket(location, order.getRequired(), order.getRequiredValue(), order.getOffered(),
 				order.getOfferedValue());
 
-		Collection<? extends Exchangeable> result = victim.getMatchingOrders(order);
+		Collection<? extends Exchangeable> result = victim.getMatching(order);
 		assertEquals(matchedMarket.getOrders(), result);
 	}
 
@@ -114,7 +122,7 @@ public class UniversalExchangeIT {
 		unmatchedMarket = createMarket(location, notRequired, order.getOfferedValue(), order.getRequired(),
 				order.getRequiredValue());
 
-		Collection<? extends Exchangeable> result = victim.getMatchingOrders(order);
+		Collection<? extends Exchangeable> result = victim.getMatching(order);
 		assertEquals(0, result.size());
 	}
 
@@ -152,7 +160,7 @@ public class UniversalExchangeIT {
 		i++;
 
 		for (int j = 0; j < i; j++) {
-			Collection<? extends Exchangeable> result = victim.getMatchingOrders(orders[j]);
+			Collection<? extends Exchangeable> result = victim.getMatching(orders[j]);
 			assertEquals(j + ": " + orders[j] + " does not get matching orders: " + result, markets[j].getOrders(),
 					result);
 		}
@@ -181,19 +189,19 @@ public class UniversalExchangeIT {
 		i++;
 
 		for (int j = 0; j < i; j++) {
-			Collection<? extends Exchangeable> check = victim.getMatchingOrders(exchangeables[j]);
+			Collection<? extends Exchangeable> check = victim.getMatching(exchangeables[j]);
 			assertEquals(size, check.size());
 			assertEquals(markets[j].getOrders(), check);
 		}
 
 		exchangeable = new ExchangeableMock(offered, offeredValue + incr, required, requiredValue);
 		Collection<? extends Exchangeable> check;
-		check = victim.getMatchingOrders(exchangeable);
+		check = victim.getMatching(exchangeable);
 		assertEquals(size, check.size());
 
-		result = victim.acceptOrder(exchangeable);
+		result = victim.accept(exchangeable);
 		assertEquals(result, exchangeable);
-		check = victim.getMatchingOrders(exchangeable);
+		check = victim.getMatching(exchangeable);
 		assertEquals(--size, check.size());
 	}
 
@@ -220,7 +228,7 @@ public class UniversalExchangeIT {
 		i++;
 
 		for (int j = 0; j < i; j++) {
-			Collection<? extends Exchangeable> check = victim.getMatchingOrders(exchangeables[j]);
+			Collection<? extends Exchangeable> check = victim.getMatching(exchangeables[j]);
 			assertEquals(size, check.size());
 			assertEquals(markets[j].getOrders(), check);
 		}
@@ -231,12 +239,12 @@ public class UniversalExchangeIT {
 		requiredValue *= numberOfOrdersToFill;
 		exchangeable = new ExchangeableMock(offered, offeredValue, required, requiredValue);
 		Collection<? extends Exchangeable> check;
-		check = victim.getMatchingOrders(exchangeable);
+		check = victim.getMatching(exchangeable);
 		assertEquals(size, check.size());
 
-		result = victim.acceptOrder(exchangeable);
+		result = victim.accept(exchangeable);
 		assertEquals(result, exchangeable);
-		check = victim.getMatchingOrders(exchangeable);
+		check = victim.getMatching(exchangeable);
 		size -= ((numberOfOrdersToPrice < numberOfOrdersToFill) ? numberOfOrdersToPrice : numberOfOrdersToFill);
 		size = (size > 0 ? size : 0);
 		assertEquals(exchangeable + " does not get matching orders: " + check, size, check.size());
@@ -291,7 +299,7 @@ public class UniversalExchangeIT {
 		i++;
 
 		for (int j = 0; j < i; j++) {
-			Collection<? extends Exchangeable> result = victim.getMatchingOrders(orders[j]);
+			Collection<? extends Exchangeable> result = victim.getMatching(orders[j]);
 			assertEquals(j + ": " + orders[j] + " does not get matching orders: " + result, markets[j].getOrders(),
 					result);
 		}
@@ -302,12 +310,12 @@ public class UniversalExchangeIT {
 		requiredValue *= numberOfOrdersToFill;
 		exchangeable = new ExchangeableMock(offered, offeredValue, required, requiredValue);
 		Collection<? extends Exchangeable> check;
-		check = victim.getMatchingOrders(exchangeable);
+		check = victim.getMatching(exchangeable);
 		assertEquals(size, check.size());
 
-		Exchangeable result = victim.acceptOrder(exchangeable);
+		Exchangeable result = victim.accept(exchangeable);
 		assertEquals(result, exchangeable);
-		check = victim.getMatchingOrders(exchangeable);
+		check = victim.getMatching(exchangeable);
 		size -= ((numberOfOrdersToPrice < numberOfOrdersToFill) ? numberOfOrdersToPrice : numberOfOrdersToFill);
 		size = (size > 0 ? size : 0);
 		assertEquals(exchangeable + " does not get matching orders: " + check, size, check.size());
@@ -320,11 +328,11 @@ public class UniversalExchangeIT {
 		// Setup a market to match the order
 		Market market = new MarketMock("matchedMarket", location,
 				location.getCode() + offered.getId() + required.getId(), offered, required);
-		market = victim.openMarket(market);
+		market = victim.open(market);
 
 		Exchangeable[] exchangeables = createMatchingOrders(offered, offeredValue, required, requiredValue);
 		for (Exchangeable exchangeable : exchangeables) {
-			victim.acceptOrder(exchangeable);
+			victim.accept(exchangeable);
 		}
 		return market;
 

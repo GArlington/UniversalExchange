@@ -2,6 +2,10 @@ package org.trading.exchange.interfaces;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.trading.exchange.interfaces.mocks.MarketMock;
+import org.trading.exchange.interfaces.mocks.UniversalExchangeMock;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by GArlington.
@@ -11,15 +15,17 @@ public class UniversalExchangeLoadTest {
 
 	@Before
 	public void setup() throws Exception {
-/*
 		victim = new UniversalExchangeMock("UniversalExchangeLoadTest", new UniversalExchange.Strategy() {
-        }, new MarketMock());
-*/
+		});
 	}
 
 	@Test
 	public void openMarket() throws Exception {
 
+		Market market = new MarketMock("marketId", Location.LONDON, "marketId", Commodity.GOLD, Commodity.GBP);
+		Market expected = market;
+		org.trading.exchange.publicInterfaces.Market result = victim.open(market);
+		assertEquals(expected, result);
 	}
 
 	@Test
@@ -36,5 +42,4 @@ public class UniversalExchangeLoadTest {
 	public void acceptOrder() throws Exception {
 
 	}
-
 }
