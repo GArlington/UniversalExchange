@@ -86,8 +86,7 @@ public interface UniversalExchange extends org.trading.exchange.publicInterfaces
 	 * @return finalised Exchangeable
 	 */
 	default Exchanged finalise(Exchangeable exchangeable) {
-		Exchangeable finalisedExchangeable = (Exchangeable) exchangeable.finalise();
-		return getStrategy().finalise(finalisedExchangeable, getPlatform());
+		return getStrategy().finalise((Exchangeable) exchangeable.finalise(), getPlatform());
 	}
 
 
