@@ -1,7 +1,9 @@
 package org.trading.exchange.interfaces.mocks;
 
 import org.trading.exchange.interfaces.UniversalExchange;
-import org.trading.exchange.publicInterfaces.*;
+import org.trading.exchange.publicInterfaces.Exchangeable;
+import org.trading.exchange.publicInterfaces.Exchanged;
+import org.trading.exchange.publicInterfaces.Market;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -37,23 +39,8 @@ public class UniversalExchangeMock implements UniversalExchange {
 	}
 
 	@Override
-	public Collection<Location> getLocations() {
-		return null;
-	}
-
-	@Override
-	public Collection<? extends Location> getLocations(Commodity commodity) {
-		return null;
-	}
-
-	@Override
 	public Collection<? extends Market> getMarkets() {
 		return markets;
-	}
-
-	@Override
-	public Collection<? extends Market> getMarkets(Location location) {
-		return getMarkets().stream().filter(o -> o.getLocation().equals(location)).collect(Collectors.toList());
 	}
 
 	@Override
@@ -126,15 +113,15 @@ public class UniversalExchangeMock implements UniversalExchange {
 	}
 
 	@Override
-	public Exchanged postProcess(Exchangeable exchangeable, UniversalExchange platform) {
-		return new ExchangedMock((Exchangeable) validate(exchangeable, platform).postProcess(),
-				getMatching(exchangeable, platform));
+	public Exchanged postProcess(Exchangeable exchangeable, Collection<? extends Exchangeable> matching,
+								 UniversalExchange platform) {
+		return new ExchangedMock((Exchangeable) validate(exchangeable, platform).postProcess(), matching);
 	}
 
 	@Override
-	public Exchanged finalise(Exchangeable exchangeable, UniversalExchange platform) {
-		return new ExchangedMock((Exchangeable) validate(exchangeable, platform).finalise(),
-				getMatching(exchangeable, platform));
+	public Exchanged finalise(Exchangeable exchangeable, Collection<? extends Exchangeable> matching,
+							  UniversalExchange platform) {
+		return new ExchangedMock((Exchangeable) validate(exchangeable, platform).finalise(), matching);
 	}
 
 	@Override

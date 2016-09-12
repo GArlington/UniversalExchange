@@ -8,7 +8,47 @@ import static org.trading.exchange.interfaces._DefaultValues.*;
  * Created by GArlington.
  */
 @XmlRootElement
-public enum Commodity implements org.trading.exchange.publicInterfaces.Commodity {
+public class Commodity implements org.trading.exchange.publicInterfaces.Commodity {
+	// Stocks and shares
+	public static final Commodity STOCKS =
+			new Commodity("#STOCKS#", "#STOCKS#", "Stocks and shares", PRICED_TO_MINIMUM_ORDER_RATIO, STOCKS_UNIT_NAME,
+					STOCKS_UNIT_NAME);
+
+
+	// Hard commodities
+	// Metals
+	public static final Commodity GOLD =
+			new Commodity("AUX", "AXU", "Gold Bullion", PRECIOUS_METALS_PRICED_TO_MINIMUM_ORDER_RATIO,
+					PRECIOUS_METALS_PRICE_UNIT_NAME, PRECIOUS_METALS_UNIT_NAME);
+	public static final Commodity SILVER =
+			new Commodity("AGX", "AXG", "Silver Bullion", PRECIOUS_METALS_PRICED_TO_MINIMUM_ORDER_RATIO,
+					PRECIOUS_METALS_PRICE_UNIT_NAME, PRECIOUS_METALS_UNIT_NAME);
+	public static final Commodity PLATINUM =
+			new Commodity("PL", "???", "Platinum Bullion", PRECIOUS_METALS_PRICED_TO_MINIMUM_ORDER_RATIO,
+					PRECIOUS_METALS_PRICE_UNIT_NAME, PRECIOUS_METALS_UNIT_NAME);
+
+	// Oil
+	public static final Commodity FUEL_OIL =
+			new Commodity("Fuel", "Oil", "Fuel Bunkers", PRICED_TO_MINIMUM_ORDER_RATIO, OIL_PRICE_UNIT_NAME,
+					OIL_UNIT_NAME);
+
+
+	// Soft commodities
+	public static final Commodity COFFEE =
+			new Commodity("COF", "COF", "Coffee", PRICED_TO_MINIMUM_ORDER_RATIO, SOFT_COMMODITIES_PRICE_UNIT_NAME,
+					SOFT_COMMODITIES_UNIT_NAME);
+
+
+	// Currencies
+	public static final Commodity USD =
+			new Commodity("USD", "USD", "United States Dollar", CURRENCY_PRICED_TO_MINIMUM_ORDER_RATIO);
+	public static final Commodity GBP =
+			new Commodity("GBP", "GBP", "Great Britain Pound", CURRENCY_PRICED_TO_MINIMUM_ORDER_RATIO);
+	public static final Commodity EUR = new Commodity("EUR", "EUR", "EU Euro", CURRENCY_PRICED_TO_MINIMUM_ORDER_RATIO);
+
+
+/*
+	public static Commodity
 	// Stocks and shares
 	STOCKS("#STOCKS#", "#STOCKS#", "Stocks and shares", PRICED_TO_MINIMUM_ORDER_RATIO, STOCKS_UNIT_NAME,
 			STOCKS_UNIT_NAME),
@@ -45,6 +85,7 @@ public enum Commodity implements org.trading.exchange.publicInterfaces.Commodity
 	EUR("EUR", "EUR", "EU Euro", CURRENCY_PRICED_TO_MINIMUM_ORDER_RATIO),
 	JPY("JPY", "JPY", "Japanese Yen", PRICED_TO_MINIMUM_ORDER_RATIO),
 	RUB("RUB", "RUB", "Russian Rouble", CURRENCY_PRICED_TO_MINIMUM_ORDER_RATIO);
+*/
 
 	private final String id;
 	private final String name;
@@ -63,8 +104,8 @@ public enum Commodity implements org.trading.exchange.publicInterfaces.Commodity
 	 *                             Gold ->
 	 *                             priceToQuantityRatio = 1000L)
 	 */
-	Commodity(String id, String name, String description, long priceToQuantityRatio) {
-		this(id, name, description, priceToQuantityRatio, name, name);
+	public Commodity(String id, String name, String description, long priceToQuantityRatio) {
+		this(id, name, description, priceToQuantityRatio, name, name, true);
 	}
 
 	/**
@@ -78,9 +119,9 @@ public enum Commodity implements org.trading.exchange.publicInterfaces.Commodity
 	 * @param priceUnit            Name of price unit (KG/Tonne/Share...)
 	 * @param quantityUnit         Name of quantity unit (KG/Tonne/Share...)
 	 */
-	Commodity(String id, String name, String description, long priceToQuantityRatio, String priceUnit,
-			  String quantityUnit) {
-		this(id, name, description, priceToQuantityRatio, priceUnit, quantityUnit, true);
+	public Commodity(String id, String name, String description, long priceToQuantityRatio, String priceUnit,
+					 String quantityUnit) {
+		this(id, name, description, priceToQuantityRatio, priceUnit, quantityUnit, false);
 	}
 
 	/**

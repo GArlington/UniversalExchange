@@ -44,14 +44,13 @@ public class MarketTest {
 
 	@Test
 	public void validateLocation() {
-		assertEquals(true, victim.validateLocation());
+		assertEquals(true, victim.validateLocation(location));
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void validateLocationFail() {
 		org.trading.exchange.publicInterfaces.Location location2 = org.trading.exchange.interfaces.Location.LONDON;
 		Market test = new MarketMock(id, location2, name, offered, required, e1, e2);
-		assertEquals(false, test.validateLocation());
 	}
 
 	@Test
