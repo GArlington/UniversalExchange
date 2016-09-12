@@ -93,7 +93,7 @@ public class UniversalExchangeMock implements UniversalExchange {
 		Exchangeable temp = (Exchangeable) validate(exchangeable, platform).preProcess();
 		Collection<? extends Exchangeable> exchangeables = getMatching(temp, platform);
 		if (exchangeables.size() > 0) {
-			match(temp, exchangeables);
+			match(temp, exchangeables, platform);
 		}
 		for (Market market : getMarkets()) {
 			if (market.validate(temp)) {
