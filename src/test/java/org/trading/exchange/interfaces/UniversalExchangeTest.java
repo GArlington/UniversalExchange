@@ -341,6 +341,15 @@ public class UniversalExchangeTest {
 		}
 
 		@Test
+		public void validateMarket() throws Exception {
+			org.trading.exchange.publicInterfaces.Market market = mock(Market.class);
+			doReturn(market).when(platform).validate(market, platform);
+
+			org.trading.exchange.publicInterfaces.Market result = victim.validate(market, platform);
+			assertEquals(market, result);
+		}
+
+		@Test
 		public void openMarket() throws Exception {
 			org.trading.exchange.publicInterfaces.Market market = mock(Market.class);
 			doReturn(market).when(platform).open(market, platform);
@@ -379,12 +388,25 @@ public class UniversalExchangeTest {
 		}
 
 		@Test
+		public void matchExchangeable() throws Exception {
+			org.trading.exchange.publicInterfaces.Exchangeable exchangeable =
+					mock(org.trading.exchange.publicInterfaces.Exchangeable.class);
+			Collection<? extends org.trading.exchange.publicInterfaces.Exchangeable> matchedExchangeables =
+					platform.getMatching(exchangeable, platform);
+			Exchanged exchanged = mock(Exchanged.class);
+			doReturn(exchanged).when(platform).match(exchangeable, matchedExchangeables, platform);
+
+			Exchanged result = victim.match(exchangeable, matchedExchangeables, platform);
+			assertEquals(exchanged, result);
+		}
+
+		@Test
 		public void processExchangeable() throws Exception {
 			org.trading.exchange.publicInterfaces.Exchangeable exchangeable =
 					mock(org.trading.exchange.publicInterfaces.Exchangeable.class);
-			Exchanged exchanged = mock(Exchanged.class);
-			when(platform.process(exchangeable, platform.getMatching(exchangeable, platform), platform))
-					.thenReturn(exchangeable);
+			Collection<? extends org.trading.exchange.publicInterfaces.Exchangeable> matchedExchangeables =
+					platform.getMatching(exchangeable, platform);
+			doReturn(exchangeable).when(platform).process(exchangeable, matchedExchangeables, platform);
 
 			org.trading.exchange.publicInterfaces.Exchangeable result = victim.process(exchangeable, platform);
 			assertEquals(exchangeable, result);
@@ -395,12 +417,12 @@ public class UniversalExchangeTest {
 			org.trading.exchange.publicInterfaces.Exchangeable exchangeable =
 					mock(org.trading.exchange.publicInterfaces.Exchangeable.class);
 			Exchanged exchanged = mock(Exchanged.class);
-			when(platform.process(exchangeable, platform.getMatching(exchangeable, platform), platform))
-					.thenReturn(exchangeable);
+			Collection<org.trading.exchange.publicInterfaces.Exchangeable> matchedExchangeables =
+					mock(Collection.class);
+			doReturn(exchangeable).when(platform).process(exchangeable, matchedExchangeables, platform);
 
 			org.trading.exchange.publicInterfaces.Exchangeable result =
-					victim.process(exchangeable, platform.getMatching(exchangeable, platform),
-							platform);
+					victim.process(exchangeable, matchedExchangeables, platform);
 			assertEquals(exchangeable, result);
 		}
 
