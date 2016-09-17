@@ -4,9 +4,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.trading.exchange.interfaces.mocks.CollectionOfExchangeableMock;
-import org.trading.exchange.interfaces.mocks.ExchangeableMock;
 import org.trading.exchange.interfaces.mocks.MarketMock;
 import org.trading.exchange.interfaces.mocks.UniversalExchangeMock;
+import org.trading.exchange.model.Commodity;
 import org.trading.exchange.publicInterfaces.Exchanged;
 
 import java.util.Collection;
@@ -24,24 +24,35 @@ public class UniversalExchangeTest {
 	org.trading.exchange.publicInterfaces.Commodity required = Commodity.GBP;
 	org.trading.exchange.publicInterfaces.Commodity notRequired = Commodity.USD;
 
-	org.trading.exchange.publicInterfaces.Exchangeable order1 = new ExchangeableMock(offered, 1_000L, required,
-			1_000L);
-	org.trading.exchange.publicInterfaces.Exchangeable order2 = new ExchangeableMock(offered, 1_000L, required,
-			1_003L);
+	org.trading.exchange.publicInterfaces.Exchangeable order1 =
+			new org.trading.exchange.model.Exchangeable.Builder<org.trading.exchange.model.Exchangeable>()
+					.setOffered(offered).setOfferedValue(1_000L).setRequired(required).setRequiredValue(1_000L)
+					.build();
+	org.trading.exchange.publicInterfaces.Exchangeable order2 =
+			new org.trading.exchange.model.Exchangeable.Builder<org.trading.exchange.model.Exchangeable>()
+					.setOffered(offered).setOfferedValue(1_000L).setRequired(required).setRequiredValue(1_000L)
+					.build();
 	CollectionOfExchangeableMock orders = new CollectionOfExchangeableMock(order1, order2);
 	org.trading.exchange.publicInterfaces.Market requiredMarket =
-			new MarketMock("requiredMarketId", Location.LONDON, "marketName", offered, required
+			new MarketMock("requiredMarketId", org.trading.exchange.model.Location.LONDON, "marketName", offered,
+					required
 					, order2, order1
 			);
 
 	org.trading.exchange.publicInterfaces.Exchangeable order11 =
-			new ExchangeableMock(offered, 1_000L, notRequired, 2_000L);
+			new org.trading.exchange.model.Exchangeable.Builder<org.trading.exchange.model.Exchangeable>()
+					.setOffered(offered).setOfferedValue(1_000L).setRequired(notRequired).setRequiredValue(1_000L)
+					.build();
 	org.trading.exchange.publicInterfaces.Exchangeable order12 =
-			new ExchangeableMock(offered, 1_000L, notRequired, 2_003L);
+			new org.trading.exchange.model.Exchangeable.Builder<org.trading.exchange.model.Exchangeable>()
+					.setOffered(offered).setOfferedValue(1_000L).setRequired(notRequired).setRequiredValue(1_000L)
+					.build();
 	CollectionOfExchangeableMock orders2 = new CollectionOfExchangeableMock(order11, order12);
 	org.trading.exchange.publicInterfaces.Market notRequiredMarket =
-			new MarketMock("notRequiredMarketId", Location.LONDON, "marketName", offered, notRequired, order12,
-					order11);
+			new org.trading.exchange.model.Market.Builder<org.trading.exchange.model.Market>()
+					.setId("notRequiredMarketId").setLocation(org.trading.exchange.model.Location.LONDON)
+					.setName("marketName").setOffered(offered).setRequired(notRequired).accept(order12).accept(order11)
+					.build();
 
 	UniversalExchange victim;
 
@@ -121,45 +132,6 @@ public class UniversalExchangeTest {
 		org.trading.exchange.publicInterfaces.Exchangeable result = victim.accept(exchangeable);
 		assertEquals(exchangeable, result);
 	}
-
-/*
-	@Test
-	public void processExchangeable() throws Exception {
-		org.trading.exchange.publicInterfaces.Exchangeable exchangeable =
-				mock(org.trading.exchange.publicInterfaces.Exchangeable.class);
-		doReturn(exchangeable).when(strategy).process(exchangeable, victim);
-		doReturn(exchangeable).when(exchangeable).process();
-
-		org.trading.exchange.publicInterfaces.Exchangeable result = victim.process(exchangeable);
-		assertEquals(exchangeable, result);
-	}
-
-	@Test
-	public void postProcessExchangeable() throws Exception {
-		org.trading.exchange.publicInterfaces.Exchangeable exchangeable =
-				mock(org.trading.exchange.publicInterfaces.Exchangeable.class);
-		Exchanged exchanged = mock(Exchanged.class);
-		doReturn(exchanged).when(strategy).postProcess(exchangeable, victim);
-		doReturn(exchangeable).when(exchangeable).postProcess();
-
-		Exchanged result = victim.postProcess(exchangeable);
-		assertEquals(exchanged, result);
-	}
-
-	@Test
-	public void finaliseExchangeable() throws Exception {
-		org.trading.exchange.publicInterfaces.Exchangeable exchangeable =
-				mock(org.trading.exchange.publicInterfaces.Exchangeable.class);
-		Exchanged exchanged = mock(Exchanged.class);
-		doReturn(exchanged).when(strategy).finalise(exchangeable, victim);
-		doReturn(exchangeable).when(exchangeable).finalise();
-
-		Exchanged result = victim.finalise(exchangeable);
-		verify(strategy).finalise(exchangeable, victim);
-		assertEquals(exchanged, result);
-	}
-*/
-
 	@Test
 	public void getMatchingExchangeables() throws Exception {
 		org.trading.exchange.publicInterfaces.Exchangeable exchangeable = mock(Exchangeable.class);
@@ -179,14 +151,13 @@ public class UniversalExchangeTest {
 		doReturn(offered).when(exchangeable).getRequired();
 		doReturn(required).when(exchangeable).getOffered();
 
-		Collection<? extends org.trading.exchange.publicInterfaces.Exchangeable> exchangeables = mock(Collection
-				.class);
+		org.trading.exchange.publicInterfaces.Exchangeable[] exchangeables = new Exchangeable[1];
 		org.trading.exchange.publicInterfaces.Exchanged expected =
 				mock(org.trading.exchange.publicInterfaces.Exchanged.class);
-		doReturn(expected).when(strategy).match(exchangeable, exchangeables, victim);
+		doReturn(expected).when(strategy).match(exchangeable, victim, exchangeables);
 
 		Exchanged result = victim.match(exchangeable, exchangeables);
-		verify(strategy).match(exchangeable, exchangeables, victim);
+		verify(strategy).match(exchangeable, victim, exchangeables);
 		assertEquals(expected, result);
 	}
 
@@ -254,7 +225,8 @@ public class UniversalExchangeTest {
 		doReturn(exchangeable).when(exchangeable).process();
 
 		org.trading.exchange.publicInterfaces.Exchangeable result =
-				victim.process(exchangeable, victim.getMatching(exchangeable), victim);
+				victim.process(exchangeable, victim, victim.getMatching(exchangeable).toArray(
+						new org.trading.exchange.publicInterfaces.Exchangeable[1]));
 		assertEquals(exchangeable, result);
 	}
 
@@ -267,10 +239,12 @@ public class UniversalExchangeTest {
 		Exchanged exchanged = mock(Exchanged.class);
 		doReturn(exchangeable).when(exchanged).getExchangeable();
 		UniversalExchange spyed = spy(victim);
-		Collection<org.trading.exchange.publicInterfaces.Exchangeable> matchedExchangeables = mock(Collection.class);
+		Collection<? extends org.trading.exchange.publicInterfaces.Exchangeable> matchedExchangeables =
+				orders.getCollection();
 		doReturn(matchedExchangeables).when(spyed).getMatching(exchangeable, spyed);
 
-		Exchanged result = spyed.postProcess(exchangeable, matchedExchangeables, spyed);
+		Exchanged result = spyed.postProcess(exchangeable, spyed,
+				matchedExchangeables.toArray(new Exchangeable[matchedExchangeables.size()]));
 		assertEquals(exchanged.getExchangeable(), result.getExchangeable());
 		assertEquals(matchedExchangeables, result.getMatchedExchangeables());
 	}
@@ -284,10 +258,13 @@ public class UniversalExchangeTest {
 		Exchanged exchanged = mock(Exchanged.class);
 		doReturn(exchangeable).when(exchanged).getExchangeable();
 		UniversalExchange spyed = spy(victim);
-		Collection<org.trading.exchange.publicInterfaces.Exchangeable> matchedExchangeables = mock(Collection.class);
-		doReturn(matchedExchangeables).when(spyed).getMatching(exchangeable, spyed);
+		Collection<? extends org.trading.exchange.publicInterfaces.Exchangeable> matchedExchangeables =
+				victim.getMatching(exchangeable, victim);
 
-		Exchanged result = spyed.finalise(exchangeable, matchedExchangeables, spyed);
+		Exchangeable[] mea = matchedExchangeables.toArray(new Exchangeable[1]);
+		assertEquals(1, mea.length);
+
+		Exchanged result = spyed.finalise(exchangeable, spyed, mea);
 		assertEquals(exchanged.getExchangeable(), result.getExchangeable());
 		assertEquals(matchedExchangeables, result.getMatchedExchangeables());
 	}
@@ -301,7 +278,7 @@ public class UniversalExchangeTest {
 
 		Collection<? extends org.trading.exchange.publicInterfaces.Exchangeable> result =
 				victim.getMatching(exchangeable, victim);
-		assertEquals(orders.getCollection(), result);
+		assert (orders.getCollection().containsAll(result) && result.containsAll(orders.getCollection()));
 	}
 
 	@Test
@@ -320,7 +297,8 @@ public class UniversalExchangeTest {
 		doReturn(exchangeable).when(expected).getExchangeable();
 		doReturn(exchangeables).when(expected).getMatchedExchangeables();
 
-		Exchanged result = victim.match(exchangeable, exchangeables, victim);
+		Exchanged result =
+				victim.match(exchangeable, victim, exchangeables.toArray(new Exchangeable[exchangeables.size()]));
 		assertEquals(expected.getExchangeable(), result.getExchangeable());
 		assertEquals(expected.getMatchedExchangeables(), result.getMatchedExchangeables());
 	}
@@ -391,12 +369,13 @@ public class UniversalExchangeTest {
 		public void matchExchangeable() throws Exception {
 			org.trading.exchange.publicInterfaces.Exchangeable exchangeable =
 					mock(org.trading.exchange.publicInterfaces.Exchangeable.class);
-			Collection<? extends org.trading.exchange.publicInterfaces.Exchangeable> matchedExchangeables =
-					platform.getMatching(exchangeable, platform);
+			org.trading.exchange.publicInterfaces.Exchangeable[] matchedExchangeables =
+					platform.getMatching(exchangeable, platform)
+							.toArray(new org.trading.exchange.publicInterfaces.Exchangeable[1]);
 			Exchanged exchanged = mock(Exchanged.class);
-			doReturn(exchanged).when(platform).match(exchangeable, matchedExchangeables, platform);
+			doReturn(exchanged).when(platform).match(exchangeable, platform, matchedExchangeables);
 
-			Exchanged result = victim.match(exchangeable, matchedExchangeables, platform);
+			Exchanged result = victim.match(exchangeable, platform, matchedExchangeables);
 			assertEquals(exchanged, result);
 		}
 
@@ -404,9 +383,10 @@ public class UniversalExchangeTest {
 		public void processExchangeable() throws Exception {
 			org.trading.exchange.publicInterfaces.Exchangeable exchangeable =
 					mock(org.trading.exchange.publicInterfaces.Exchangeable.class);
-			Collection<? extends org.trading.exchange.publicInterfaces.Exchangeable> matchedExchangeables =
-					platform.getMatching(exchangeable, platform);
-			doReturn(exchangeable).when(platform).process(exchangeable, matchedExchangeables, platform);
+			org.trading.exchange.publicInterfaces.Exchangeable[] matchedExchangeables =
+					platform.getMatching(exchangeable, platform)
+							.toArray(new org.trading.exchange.publicInterfaces.Exchangeable[1]);
+			doReturn(exchangeable).when(platform).process(exchangeable, platform, matchedExchangeables);
 
 			org.trading.exchange.publicInterfaces.Exchangeable result = victim.process(exchangeable, platform);
 			assertEquals(exchangeable, result);
@@ -417,12 +397,13 @@ public class UniversalExchangeTest {
 			org.trading.exchange.publicInterfaces.Exchangeable exchangeable =
 					mock(org.trading.exchange.publicInterfaces.Exchangeable.class);
 			Exchanged exchanged = mock(Exchanged.class);
-			Collection<org.trading.exchange.publicInterfaces.Exchangeable> matchedExchangeables =
-					mock(Collection.class);
-			doReturn(exchangeable).when(platform).process(exchangeable, matchedExchangeables, platform);
+			org.trading.exchange.publicInterfaces.Exchangeable[] matchedExchangeables =
+					platform.getMatching(exchangeable, platform)
+							.toArray(new org.trading.exchange.publicInterfaces.Exchangeable[1]);
+			doReturn(exchangeable).when(platform).process(exchangeable, platform, matchedExchangeables);
 
 			org.trading.exchange.publicInterfaces.Exchangeable result =
-					victim.process(exchangeable, matchedExchangeables, platform);
+					victim.process(exchangeable, platform, matchedExchangeables);
 			assertEquals(exchangeable, result);
 		}
 
@@ -432,11 +413,12 @@ public class UniversalExchangeTest {
 					mock(org.trading.exchange.publicInterfaces.Exchangeable.class);
 			doReturn(exchangeable).when(exchangeable).postProcess();
 			Exchanged exchanged = mock(Exchanged.class);
-			Collection<org.trading.exchange.publicInterfaces.Exchangeable> matchedExchangeables =
-					mock(Collection.class);
-			doReturn(exchanged).when(platform).postProcess(exchangeable, matchedExchangeables, platform);
+			org.trading.exchange.publicInterfaces.Exchangeable[] matchedExchangeables =
+					platform.getMatching(exchangeable, platform)
+							.toArray(new org.trading.exchange.publicInterfaces.Exchangeable[1]);
+			doReturn(exchanged).when(platform).postProcess(exchangeable, platform, matchedExchangeables);
 
-			Exchanged result = victim.postProcess(exchangeable, matchedExchangeables, platform);
+			Exchanged result = victim.postProcess(exchangeable, platform, matchedExchangeables);
 			assertEquals(exchanged, result);
 		}
 
@@ -446,11 +428,12 @@ public class UniversalExchangeTest {
 					mock(org.trading.exchange.publicInterfaces.Exchangeable.class);
 			doReturn(exchangeable).when(exchangeable).finalise();
 			Exchanged exchanged = mock(Exchanged.class);
-			Collection<org.trading.exchange.publicInterfaces.Exchangeable> matchedExchangeables =
-					mock(Collection.class);
-			doReturn(exchanged).when(platform).finalise(exchangeable, matchedExchangeables, platform);
+			org.trading.exchange.publicInterfaces.Exchangeable[] matchedExchangeables =
+					platform.getMatching(exchangeable, platform)
+							.toArray(new org.trading.exchange.publicInterfaces.Exchangeable[1]);
+			doReturn(exchanged).when(platform).finalise(exchangeable, platform, matchedExchangeables);
 
-			Exchanged result = victim.finalise(exchangeable, matchedExchangeables, platform);
+			Exchanged result = victim.finalise(exchangeable, platform, matchedExchangeables);
 			assertEquals(exchanged, result);
 		}
 

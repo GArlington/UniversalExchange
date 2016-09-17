@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.trading.exchange.interfaces.mocks.MarketMock;
 import org.trading.exchange.interfaces.mocks.UniversalExchangeMock;
+import org.trading.exchange.model.Commodity;
 
 import static org.junit.Assert.assertEquals;
 
@@ -21,8 +22,9 @@ public class UniversalExchangeLoadTest {
 
 	@Test
 	public void openMarket() throws Exception {
-
-		Market market = new MarketMock("marketId", Location.LONDON, "marketId", Commodity.GOLD, Commodity.GBP);
+		Market market =
+				new MarketMock("marketId", org.trading.exchange.model.Location.LONDON, "marketId", Commodity.GOLD,
+						Commodity.GBP);
 		Market expected = market;
 		org.trading.exchange.publicInterfaces.Market result = victim.open(market);
 		assertEquals(expected, result);

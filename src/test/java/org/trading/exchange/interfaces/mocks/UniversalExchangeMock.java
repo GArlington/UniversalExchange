@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Comparator.comparing;
 
@@ -93,7 +94,7 @@ public class UniversalExchangeMock implements UniversalExchange {
 		Exchangeable temp = (Exchangeable) validate(exchangeable, platform).preProcess();
 		Collection<? extends Exchangeable> exchangeables = getMatching(temp, platform);
 		if (exchangeables.size() > 0) {
-			match(temp, exchangeables, platform);
+			match(temp, platform, exchangeables.toArray(new Exchangeable[exchangeables.size()]));
 		}
 		for (Market market : getMarkets()) {
 			if (market.validate(temp)) {
@@ -107,21 +108,20 @@ public class UniversalExchangeMock implements UniversalExchange {
 	}
 
 	@Override
-	public Exchangeable process(Exchangeable exchangeable, Collection<? extends Exchangeable> matching,
-								UniversalExchange platform) {
+	public Exchangeable process(Exchangeable exchangeable, UniversalExchange platform, Exchangeable... matching) {
 		return (Exchangeable) validate(exchangeable, platform).process();
 	}
 
 	@Override
-	public Exchanged postProcess(Exchangeable exchangeable, Collection<? extends Exchangeable> matching,
-								 UniversalExchange platform) {
-		return new ExchangedMock((Exchangeable) validate(exchangeable, platform).postProcess(), matching);
+	public Exchanged postProcess(Exchangeable exchangeable, UniversalExchange platform, Exchangeable... matching) {
+		return new org.trading.exchange.model.Exchanged((Exchangeable) validate(exchangeable, platform).postProcess(),
+				matching);
 	}
 
 	@Override
-	public Exchanged finalise(Exchangeable exchangeable, Collection<? extends Exchangeable> matching,
-							  UniversalExchange platform) {
-		return new ExchangedMock((Exchangeable) validate(exchangeable, platform).finalise(), matching);
+	public Exchanged finalise(Exchangeable exchangeable, UniversalExchange platform, Exchangeable... matching) {
+		return new org.trading.exchange.model.Exchanged((Exchangeable) validate(exchangeable, platform).finalise(),
+				matching);
 	}
 
 	@Override
@@ -136,17 +136,17 @@ public class UniversalExchangeMock implements UniversalExchange {
 	}
 
 	@Override
-	public Exchanged match(Exchangeable exchangeable, Collection<? extends Exchangeable> matchingOrders,
-						   UniversalExchange platform) {
+	public Exchanged match(Exchangeable exchangeable, UniversalExchange platform, Exchangeable... matching) {
 		Collection<Exchangeable> matchedOrders = new LinkedList<>();
-		matchingOrders.stream()
+		Stream.of(matching)
 				.filter(order -> (!Exchangeable.State.OPEN.precedes(order.getExchangeableState()) &&
 						order.getOffered().equals(exchangeable.getRequired()) &&
 						order.getRequired().equals(exchangeable.getOffered())))
 				.map(ex2 -> (org.trading.exchange.interfaces.Exchangeable) ex2)
 				.sorted(comparing(org.trading.exchange.interfaces.Exchangeable::getExchangeRate))
 				.forEach(ex3 -> matchedOrders.add(exchangeable.match(ex3)));
-		return new ExchangedMock(exchangeable, matchedOrders);
+		return new org.trading.exchange.model.Exchanged(exchangeable,
+				matchedOrders.toArray(new Exchangeable[matchedOrders.size()]));
 	}
 
 	@Override

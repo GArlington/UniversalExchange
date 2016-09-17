@@ -3,10 +3,10 @@ package org.trading.exchange.interfaces;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.trading.exchange.interfaces.mocks.ExchangeableMock;
-import org.trading.exchange.interfaces.mocks.MarketMock;
 import org.trading.exchange.interfaces.mocks.UniversalExchangeMock;
+import org.trading.exchange.model.Commodity;
 import org.trading.exchange.publicInterfaces.Exchangeable;
+import org.trading.exchange.publicInterfaces.Location;
 import org.trading.exchange.publicInterfaces.Market;
 
 import java.util.Collection;
@@ -102,8 +102,11 @@ public class UniversalExchangeIT {
 
 	@Test
 	public void getMatchingOrders() throws Exception {
-		Location location = Location.LONDON;
-		Exchangeable order = new ExchangeableMock(offered, 1L, required, 1L);
+		Location location = org.trading.exchange.model.Location.LONDON;
+		Exchangeable order =
+				new org.trading.exchange.model.Exchangeable.Builder<org.trading.exchange.model.Exchangeable>()
+						.setOffered(offered).setOfferedValue(1L).setRequired(required).setRequiredValue(1_000L)
+						.build();
 		matchedMarket = createMarket(location, order.getRequired(), order.getRequiredValue(), order.getOffered(),
 				order.getOfferedValue());
 
@@ -113,7 +116,7 @@ public class UniversalExchangeIT {
 
 	@Test
 	public void getMatchingOrdersFailNoMatchingOrders() throws Exception {
-		Location location = Location.LONDON;
+		Location location = org.trading.exchange.model.Location.LONDON;
 		Exchangeable order = mock(Exchangeable.class);
 		doReturn(required).when(order).getOffered();
 		doReturn(1L).when(order).getOfferedValue();
@@ -130,30 +133,37 @@ public class UniversalExchangeIT {
 	public void testMultipleMarkets() throws Exception {
 		int size = orderPoolSize, i = 0;
 		Exchangeable[] orders = new Exchangeable[size];
-		Location location;
+		Location location = org.trading.exchange.model.Location.LONDON;
 		Market[] markets = new Market[size];
 		Exchangeable order;
 
-		location = Location.LONDON;
-		order = new ExchangeableMock(Commodity.GBP, 1L, Commodity.GOLD, 1L);
+		order = new org.trading.exchange.model.Exchangeable.Builder<org.trading.exchange.model.Exchangeable>()
+				.setOffered(Commodity.GBP).setOfferedValue(1L).setRequired(Commodity.GOLD).setRequiredValue(1_000L)
+				.build();
 		orders[i] = order;
 		markets[i] = createMarket(location, order.getRequired(), order.getRequiredValue(), order.getOffered(),
 				order.getOfferedValue());
 		i++;
 
-		order = new ExchangeableMock(Commodity.GOLD, 1L, Commodity.SILVER, 1L);
+		order = new org.trading.exchange.model.Exchangeable.Builder<org.trading.exchange.model.Exchangeable>()
+				.setOffered(Commodity.GOLD).setOfferedValue(1L).setRequired(Commodity.SILVER).setRequiredValue(1_000L)
+				.build();
 		orders[i] = order;
 		markets[i] = createMarket(location, order.getRequired(), order.getRequiredValue(), order.getOffered(),
 				order.getOfferedValue());
 		i++;
 
-		order = new ExchangeableMock(Commodity.SILVER, 1L, Commodity.EUR, 1L);
+		order = new org.trading.exchange.model.Exchangeable.Builder<org.trading.exchange.model.Exchangeable>()
+				.setOffered(Commodity.SILVER).setOfferedValue(1L).setRequired(Commodity.EUR).setRequiredValue(1_000L)
+				.build();
 		orders[i] = order;
 		markets[i] = createMarket(location, order.getRequired(), order.getRequiredValue(), order.getOffered(),
 				order.getOfferedValue());
 		i++;
 
-		order = new ExchangeableMock(Commodity.EUR, 1L, Commodity.GBP, 1L);
+		order = new org.trading.exchange.model.Exchangeable.Builder<org.trading.exchange.model.Exchangeable>()
+				.setOffered(Commodity.EUR).setOfferedValue(1L).setRequired(Commodity.GBP).setRequiredValue(1_000L)
+				.build();
 		orders[i] = order;
 		markets[i] = createMarket(location, order.getRequired(), order.getRequiredValue(), order.getOffered(),
 				order.getOfferedValue());
@@ -171,10 +181,10 @@ public class UniversalExchangeIT {
 		int size = orderPoolSize, i = 0, incr = 5;
 		Exchangeable[] exchangeables = new Exchangeable[size];
 		Market[] markets = new Market[size];
-		Location location = Location.LONDON;
+		Location location = org.trading.exchange.model.Location.LONDON;
 
 		Exchangeable exchangeable, result;
-		Commodity offered, required;
+		org.trading.exchange.publicInterfaces.Commodity offered, required;
 
 		offered = Commodity.GBP;
 		required = Commodity.SILVER;
@@ -182,7 +192,10 @@ public class UniversalExchangeIT {
 		offeredValue = 450L;
 		requiredValue = 1L;
 
-		exchangeable = new ExchangeableMock(offered, offeredValue, required, requiredValue);
+		exchangeable = new org.trading.exchange.model.Exchangeable.Builder<org.trading.exchange.model.Exchangeable>()
+				.setOffered(offered).setOfferedValue(offeredValue).setRequired(required)
+				.setRequiredValue(requiredValue)
+				.build();
 		exchangeables[i] = exchangeable;
 		markets[i] = createMarket(location, exchangeable.getRequired(), exchangeable.getRequiredValue(),
 				exchangeable.getOffered(), exchangeable.getOfferedValue());
@@ -194,7 +207,10 @@ public class UniversalExchangeIT {
 			assertEquals(markets[j].getOrders(), check);
 		}
 
-		exchangeable = new ExchangeableMock(offered, offeredValue + incr, required, requiredValue);
+		exchangeable = new org.trading.exchange.model.Exchangeable.Builder<org.trading.exchange.model.Exchangeable>()
+				.setOffered(offered).setOfferedValue(offeredValue + incr).setRequired(required).setRequiredValue
+						(requiredValue)
+				.build();
 		Collection<? extends Exchangeable> check;
 		check = victim.getMatching(exchangeable);
 		assertEquals(size, check.size());
@@ -202,7 +218,7 @@ public class UniversalExchangeIT {
 		result = victim.accept(exchangeable);
 		assertEquals(result, exchangeable);
 		check = victim.getMatching(exchangeable);
-		assertEquals(--size, check.size());
+		assertEquals(exchangeable + " does not get matching orders: " + check, --size, check.size());
 	}
 
 	@Test
@@ -210,10 +226,10 @@ public class UniversalExchangeIT {
 		int size = orderPoolSize, i = 0;
 		Exchangeable[] exchangeables = new Exchangeable[size];
 		Market[] markets = new Market[size];
-		Location location = Location.LONDON;
+		Location location = org.trading.exchange.model.Location.LONDON;
 
 		Exchangeable exchangeable, result;
-		Commodity offered, required;
+		org.trading.exchange.publicInterfaces.Commodity offered, required;
 
 		offered = Commodity.GBP;
 		required = Commodity.SILVER;
@@ -221,7 +237,10 @@ public class UniversalExchangeIT {
 		offeredValue = 450L;
 		requiredValue = 1L;
 
-		exchangeable = new ExchangeableMock(offered, offeredValue, required, requiredValue);
+		exchangeable = new org.trading.exchange.model.Exchangeable.Builder<org.trading.exchange.model.Exchangeable>()
+				.setOffered(offered).setOfferedValue(offeredValue).setRequired(required).setRequiredValue
+						(requiredValue)
+				.build();
 		exchangeables[i] = exchangeable;
 		markets[i] = createMarket(location, exchangeable.getRequired(), exchangeable.getRequiredValue(),
 				exchangeable.getOffered(), exchangeable.getOfferedValue());
@@ -237,7 +256,10 @@ public class UniversalExchangeIT {
 		long numberOfOrdersToPrice = 3;
 		offeredValue = (offeredValue + (numberOfOrdersToPrice - 1)) * numberOfOrdersToFill;
 		requiredValue *= numberOfOrdersToFill;
-		exchangeable = new ExchangeableMock(offered, offeredValue, required, requiredValue);
+		exchangeable = new org.trading.exchange.model.Exchangeable.Builder<org.trading.exchange.model.Exchangeable>()
+				.setOffered(offered).setOfferedValue(offeredValue).setRequired(required).setRequiredValue
+						(requiredValue)
+				.build();
 		Collection<? extends Exchangeable> check;
 		check = victim.getMatching(exchangeable);
 		assertEquals(size, check.size());
@@ -254,10 +276,10 @@ public class UniversalExchangeIT {
 	public void testCreateMultipleMarketsAddExchangeablesMatchExchangeable() throws Exception {
 		int size = orderPoolSize, i = 0;
 		Exchangeable[] orders = new Exchangeable[size];
-		Location location = Location.LONDON;
+		Location location = org.trading.exchange.model.Location.LONDON;
 		Market[] markets = new Market[size];
 
-		Commodity offered, required, offered2, required2;
+		org.trading.exchange.publicInterfaces.Commodity offered, required, offered2, required2;
 		offered = Commodity.GBP;
 		required = Commodity.SILVER;
 		long offeredValue, requiredValue, offeredValue2, requiredValue2;
@@ -266,7 +288,10 @@ public class UniversalExchangeIT {
 
 		Exchangeable exchangeable;
 
-		exchangeable = new ExchangeableMock(offered, offeredValue, required, requiredValue);
+		exchangeable = new org.trading.exchange.model.Exchangeable.Builder<org.trading.exchange.model.Exchangeable>()
+				.setOffered(offered).setOfferedValue(offeredValue).setRequired(required).setRequiredValue
+						(requiredValue)
+				.build();
 		orders[i] = exchangeable;
 		markets[i] = createMarket(location, exchangeable.getRequired(), exchangeable.getRequiredValue(),
 				exchangeable.getOffered(),
@@ -275,7 +300,10 @@ public class UniversalExchangeIT {
 
 		offered2 = Commodity.GOLD;
 		offeredValue2 = 1L;
-		exchangeable = new ExchangeableMock(required, requiredValue, offered2, offeredValue2);
+		exchangeable = new org.trading.exchange.model.Exchangeable.Builder<org.trading.exchange.model.Exchangeable>()
+				.setOffered(required).setOfferedValue(requiredValue).setRequired(offered2)
+				.setRequiredValue(offeredValue2)
+				.build();
 		orders[i] = exchangeable;
 		markets[i] = createMarket(location, exchangeable.getRequired(), exchangeable.getRequiredValue(),
 				exchangeable.getOffered(),
@@ -284,14 +312,20 @@ public class UniversalExchangeIT {
 
 		required2 = Commodity.EUR;
 		requiredValue2 = 510L;
-		exchangeable = new ExchangeableMock(offered2, offeredValue2, required2, requiredValue2);
+		exchangeable = new org.trading.exchange.model.Exchangeable.Builder<org.trading.exchange.model.Exchangeable>()
+				.setOffered(offered2).setOfferedValue(offeredValue2).setRequired(required2)
+				.setRequiredValue(requiredValue2)
+				.build();
 		orders[i] = exchangeable;
 		markets[i] = createMarket(location, exchangeable.getRequired(), exchangeable.getRequiredValue(),
 				exchangeable.getOffered(),
 				exchangeable.getOfferedValue());
 		i++;
 
-		exchangeable = new ExchangeableMock(required2, requiredValue2, offered, offeredValue);
+		exchangeable = new org.trading.exchange.model.Exchangeable.Builder<org.trading.exchange.model.Exchangeable>()
+				.setOffered(required2).setOfferedValue(requiredValue2).setRequired(offered)
+				.setRequiredValue(requiredValue)
+				.build();
 		orders[i] = exchangeable;
 		markets[i] = createMarket(location, exchangeable.getRequired(), exchangeable.getRequiredValue(),
 				exchangeable.getOffered(),
@@ -308,7 +342,10 @@ public class UniversalExchangeIT {
 		long numberOfOrdersToPrice = 5;
 		offeredValue = (offeredValue + (numberOfOrdersToPrice - 1)) * numberOfOrdersToFill;
 		requiredValue *= numberOfOrdersToFill;
-		exchangeable = new ExchangeableMock(offered, offeredValue, required, requiredValue);
+		exchangeable = new org.trading.exchange.model.Exchangeable.Builder<org.trading.exchange.model.Exchangeable>()
+				.setOffered(offered).setOfferedValue(offeredValue).setRequired(required).setRequiredValue
+						(requiredValue)
+				.build();
 		Collection<? extends Exchangeable> check;
 		check = victim.getMatching(exchangeable);
 		assertEquals(size, check.size());
@@ -319,15 +356,16 @@ public class UniversalExchangeIT {
 		size -= ((numberOfOrdersToPrice < numberOfOrdersToFill) ? numberOfOrdersToPrice : numberOfOrdersToFill);
 		size = (size > 0 ? size : 0);
 		assertEquals(exchangeable + " does not get matching orders: " + check, size, check.size());
-//		System.out.println(victim);
 	}
 
 	private Market createMarket(Location location,
 								org.trading.exchange.publicInterfaces.Commodity offered, long offeredValue,
 								org.trading.exchange.publicInterfaces.Commodity required, long requiredValue) {
 		// Setup a market to match the order
-		Market market = new MarketMock("matchedMarket", location,
-				location.getCode() + offered.getId() + required.getId(), offered, required);
+		Market market = new org.trading.exchange.model.Market.Builder<org.trading.exchange.model.Market>()
+				.setId("matchedMarket").setLocation(location)
+				.setName(location.getCode() + offered.getId() + required.getId()).setOffered(offered)
+				.setRequired(required).build();
 		market = victim.open(market);
 
 		Exchangeable[] exchangeables = createMatchingOrders(offered, offeredValue, required, requiredValue);
@@ -344,7 +382,10 @@ public class UniversalExchangeIT {
 												long requiredValue) {
 		Exchangeable[] matchedOrders = new Exchangeable[orderPoolSize];
 		for (int i = 0; i < orderPoolSize; i++) {
-			matchedOrders[i] = new ExchangeableMock(offered, offeredValue, required, requiredValue + i);
+			matchedOrders[i] =
+					new org.trading.exchange.model.Exchangeable.Builder<org.trading.exchange.model.Exchangeable>()
+							.setOffered(offered).setOfferedValue(offeredValue).setRequired(required)
+							.setRequiredValue(requiredValue + i).build();
 		}
 		return matchedOrders;
 	}

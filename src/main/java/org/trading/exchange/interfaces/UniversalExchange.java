@@ -51,8 +51,8 @@ public interface UniversalExchange extends org.trading.exchange.publicInterfaces
 	}
 
 	@Override
-	default Exchanged match(Exchangeable exchangeable, Collection<? extends Exchangeable> matchingOrders) {
-		return getStrategy().match(exchangeable, matchingOrders, getPlatform());
+	default Exchanged match(Exchangeable exchangeable, Exchangeable... matchingOrders) {
+		return getStrategy().match(exchangeable, getPlatform(), matchingOrders);
 	}
 
 	Strategy getStrategy();
@@ -111,8 +111,7 @@ public interface UniversalExchange extends org.trading.exchange.publicInterfaces
 	 * @param market
 	 * @return
 	 */
-	Market open(Market market, UniversalExchange platform)
-			throws IllegalStateException, InvalidParameterException;
+	Market open(Market market, UniversalExchange platform) throws IllegalStateException, InvalidParameterException;
 
 	/**
 	 * Close market implementation
@@ -146,32 +145,31 @@ public interface UniversalExchange extends org.trading.exchange.publicInterfaces
 	 * Process Exchangeable implementation
 	 *
 	 * @param exchangeable
-	 * @param matching
 	 * @param platform
+	 * @param matching
 	 * @return
 	 */
-	Exchangeable process(Exchangeable exchangeable, Collection<? extends Exchangeable> matching, UniversalExchange
-			platform);
+	Exchangeable process(Exchangeable exchangeable, UniversalExchange platform, Exchangeable... matching);
 
 	/**
 	 * PostProcess Exchangeable implementation
 	 *
 	 * @param exchangeable
 	 * @param platform
+	 * @param matching
 	 * @return
 	 */
-	Exchanged postProcess(Exchangeable exchangeable, Collection<? extends Exchangeable> matching, UniversalExchange
-			platform);
+	Exchanged postProcess(Exchangeable exchangeable, UniversalExchange platform, Exchangeable... matching);
 
 	/**
 	 * Finalise Exchangeable implementation
 	 *
 	 * @param exchangeable
 	 * @param platform
+	 * @param matching
 	 * @return
 	 */
-	Exchanged finalise(Exchangeable exchangeable, Collection<? extends Exchangeable> matching, UniversalExchange
-			platform);
+	Exchanged finalise(Exchangeable exchangeable, UniversalExchange platform, Exchangeable... matching);
 
 	/**
 	 * Get matching orders implementation
@@ -187,12 +185,11 @@ public interface UniversalExchange extends org.trading.exchange.publicInterfaces
 	 * Process Exchangeable with matched orders implementation
 	 *
 	 * @param exchangeable
-	 * @param matchingOrders
 	 * @param platform
+	 * @param matching
 	 * @return
 	 */
-	Exchanged match(Exchangeable exchangeable, Collection<? extends Exchangeable> matchingOrders,
-					UniversalExchange platform);
+	Exchanged match(Exchangeable exchangeable, UniversalExchange platform, Exchangeable... matching);
 
 	/**
 	 * Default strategy is to pass all functionality directly to platform specific implementation
@@ -220,28 +217,25 @@ public interface UniversalExchange extends org.trading.exchange.publicInterfaces
 			return platform.accept(exchangeable, platform);
 		}
 
-		default Exchanged match(Exchangeable exchangeable, Collection<? extends Exchangeable> matching,
-								UniversalExchange platform) {
-			return platform.match(exchangeable, matching, platform);
+		default Exchanged match(Exchangeable exchangeable, UniversalExchange platform, Exchangeable... matching) {
+			return platform.match(exchangeable, platform, matching);
 		}
 
 		default Exchangeable process(Exchangeable exchangeable, UniversalExchange platform) {
-			return process(exchangeable, getMatching(exchangeable, platform), platform);
+			return process(exchangeable, platform, getMatching(exchangeable, platform).toArray(new Exchangeable[1]));
 		}
 
-		default Exchangeable process(Exchangeable exchangeable, Collection<? extends Exchangeable> matching,
-									 UniversalExchange platform) {
-			return platform.process(exchangeable, matching, platform);
+		default Exchangeable process(Exchangeable exchangeable, UniversalExchange platform, Exchangeable... matching) {
+			return platform.process(exchangeable, platform, matching);
 		}
 
-		default Exchanged postProcess(Exchangeable exchangeable, Collection<? extends Exchangeable> matching,
-									  UniversalExchange platform) {
-			return platform.postProcess((Exchangeable) exchangeable.postProcess(), matching, platform);
+		default Exchanged postProcess(Exchangeable exchangeable, UniversalExchange platform, Exchangeable...
+				matching) {
+			return platform.postProcess((Exchangeable) exchangeable.postProcess(), platform, matching);
 		}
 
-		default Exchanged finalise(Exchangeable exchangeable, Collection<? extends Exchangeable> matching,
-								   UniversalExchange platform) {
-			return platform.finalise((Exchangeable) exchangeable.finalise(), matching, platform);
+		default Exchanged finalise(Exchangeable exchangeable, UniversalExchange platform, Exchangeable... matching) {
+			return platform.finalise((Exchangeable) exchangeable.finalise(), platform, matching);
 		}
 
 		default Collection<? extends Exchangeable> getMatching(Exchangeable exchangeable, UniversalExchange platform) {
