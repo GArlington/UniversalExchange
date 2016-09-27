@@ -133,7 +133,7 @@ public class MarketMock implements Market {
 		@Override
 		public Builder<T> accept(Exchangeable exchangeable) {
 			@SuppressWarnings("unchecked")
-			Collection<Exchangeable> orders = this.orders;
+			Collection<Exchangeable> orders = (Collection<Exchangeable>) this.orders;
 			orders.add(exchangeable);
 			return this;
 		}
