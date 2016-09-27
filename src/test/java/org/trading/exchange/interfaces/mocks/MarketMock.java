@@ -66,11 +66,17 @@ public class MarketMock implements Market {
 	public boolean accept(Exchangeable exchangeable) {
 		if (validate(exchangeable)) {
 			synchronized (orders) {
-				return ((Collection<Exchangeable>) orders)
-						.add(((org.trading.exchange.interfaces.Exchangeable) exchangeable).open());
+				@SuppressWarnings("unchecked")
+				Collection<Exchangeable> orders = (Collection<Exchangeable>) this.orders;
+				return orders.add(((org.trading.exchange.interfaces.Exchangeable) exchangeable).open());
 			}
 		}
 		return false;
+	}
+
+	@Override
+	public boolean validate() throws IllegalStateException {
+		return true;
 	}
 
 	@Override
@@ -126,14 +132,18 @@ public class MarketMock implements Market {
 
 		@Override
 		public Builder<T> accept(Exchangeable exchangeable) {
-			((Collection<Exchangeable>) this.orders).add(exchangeable);
+			@SuppressWarnings("unchecked")
+			Collection<Exchangeable> orders = this.orders;
+			orders.add(exchangeable);
 			return this;
 		}
 
 		@Override
 		public T build() {
-			return (T) new MarketMock(id, location, name, offered, required,
+			@SuppressWarnings("unchecked")
+			T result = (T) new MarketMock(id, location, name, offered, required,
 					orders.toArray(new Exchangeable[orders.size()]));
+			return result;
 		}
 	}
 }

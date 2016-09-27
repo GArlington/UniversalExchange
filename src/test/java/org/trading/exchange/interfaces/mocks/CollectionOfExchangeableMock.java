@@ -1,6 +1,6 @@
 package org.trading.exchange.interfaces.mocks;
 
-import org.trading.exchange.publicInterfaces.Exchangeable;
+import org.trading.exchange.interfaces.Exchangeable;
 
 import java.util.Arrays;
 import java.util.Collection;
