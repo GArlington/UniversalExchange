@@ -21,6 +21,7 @@ import static org.mockito.Mockito.*;
 /**
  * Created by GArlington.
  */
+@SuppressWarnings("unchecked")
 public class UniversalExchangeTest {
 	String name = "UniversalExchangeName";
 	UniversalExchange.Strategy strategy = mock(UniversalExchange.Strategy.class);
