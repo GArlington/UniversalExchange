@@ -4,6 +4,7 @@ import org.trading.exchange.interfaces.UniversalExchange;
 import org.trading.exchange.publicInterfaces.Exchangeable;
 import org.trading.exchange.publicInterfaces.Exchanged;
 import org.trading.exchange.publicInterfaces.Market;
+import org.trading.exchange.publicInterfaces.Owner;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -23,21 +24,25 @@ public class UniversalExchangeMock implements UniversalExchange {
 	private Strategy strategy;
 	private Collection<? extends Market> markets = new LinkedList<>();
 	private UniversalExchange platform;
+	private Owner owner;
 	private boolean autoMatching;
 
-	public UniversalExchangeMock(String name, Strategy strategy, boolean autoMatching, Market... markets) {
+	public UniversalExchangeMock(String name, Strategy strategy, Owner owner, boolean autoMatching, Market...
+			markets) {
 		this.platform = this;
 		this.name = name;
 		this.strategy = strategy;
+		this.owner = owner;
 		for (Market market : markets) {
 			assertNotNull(this.open(market, this.getPlatform()));
 		}
 		this.autoMatching = autoMatching;
 	}
 
-	public UniversalExchangeMock(String name, Strategy strategy, UniversalExchange platform, boolean autoMatching,
+	public UniversalExchangeMock(String name, Strategy strategy, UniversalExchange platform, Owner owner,
+								 boolean autoMatching,
 								 Market... markets) {
-		this(name, strategy, autoMatching, markets);
+		this(name, strategy, owner, autoMatching, markets);
 		this.platform = platform;
 	}
 
@@ -49,6 +54,11 @@ public class UniversalExchangeMock implements UniversalExchange {
 	@Override
 	public boolean isAutoMatching() {
 		return autoMatching;
+	}
+
+	@Override
+	public Owner getOwner() {
+		return owner;
 	}
 
 	@Override

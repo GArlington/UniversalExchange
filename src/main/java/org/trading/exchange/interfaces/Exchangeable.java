@@ -27,15 +27,11 @@ public interface Exchangeable extends org.trading.exchange.publicInterfaces.Exch
 
 	/**
 	 * Get exchange rate
-	 *
-	 * @return
 	 */
 	SimpleDecimal getExchangeRate();
 
 	/**
 	 * Get inverse exchange rate
-	 *
-	 * @return
 	 */
 	SimpleDecimal getInverseExchangeRate();
 
@@ -59,7 +55,6 @@ public interface Exchangeable extends org.trading.exchange.publicInterfaces.Exch
 	 * Check if this Exchangeable is fully matched (satisfied) by the Exchangeable passed as parameter
 	 *
 	 * @param exchangeable
-	 * @return
 	 */
 	default boolean isFullyMatched(Exchangeable exchangeable) {
 		return (isPartiallyMatched(exchangeable) && getOfferedValue() <= exchangeable.getRequiredValue()
@@ -72,7 +67,6 @@ public interface Exchangeable extends org.trading.exchange.publicInterfaces.Exch
 	 * Check if this Exchangeable is partially matched by the Exchangeable passed as parameter
 	 *
 	 * @param exchangeable
-	 * @return
 	 */
 	default boolean isPartiallyMatched(Exchangeable exchangeable) {
 		return (!State.OPEN.precedes(exchangeable.getExchangeableState())

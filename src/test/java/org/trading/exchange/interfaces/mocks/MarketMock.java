@@ -4,6 +4,7 @@ import org.trading.exchange.interfaces.Market;
 import org.trading.exchange.publicInterfaces.Commodity;
 import org.trading.exchange.publicInterfaces.Exchangeable;
 import org.trading.exchange.publicInterfaces.Location;
+import org.trading.exchange.publicInterfaces.Owner;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -18,14 +19,20 @@ public class MarketMock implements Market {
 	private String name;
 	private Commodity offered;
 	private Commodity required;
+	private Owner owner;
 
-	public MarketMock(String id, Location location, String name, Commodity offered, Commodity required,
-					  Exchangeable... orders) {
+	private MarketMock(String id, Location location, String name, Commodity offered, Commodity required, Owner owner) {
 		this.id = id;
 		this.location = location;
 		this.name = name;
 		this.offered = offered;
 		this.required = required;
+		this.owner = owner;
+	}
+
+	private MarketMock(String id, Location location, String name, Commodity offered, Commodity required, Owner owner,
+					   Exchangeable... orders) {
+		this(id, location, name, offered, required, owner);
 		for (Exchangeable exchangeable : orders) {
 			accept(exchangeable);
 		}
@@ -60,6 +67,11 @@ public class MarketMock implements Market {
 	@Override
 	public Collection<? extends Exchangeable> getOrders() {
 		return orders;
+	}
+
+	@Override
+	public Owner getOwner() {
+		return owner;
 	}
 
 	@Override
@@ -99,6 +111,7 @@ public class MarketMock implements Market {
 		private String name;
 		private Commodity offered;
 		private Commodity required;
+		private Owner owner;
 
 		@Override
 		public Builder<T> setId(String s) {
@@ -139,9 +152,15 @@ public class MarketMock implements Market {
 		}
 
 		@Override
+		public Builder<T> setOwner(Owner owner) {
+			this.owner = owner;
+			return this;
+		}
+
+		@Override
 		public T build() {
 			@SuppressWarnings("unchecked")
-			T result = (T) new MarketMock(id, location, name, offered, required,
+			T result = (T) new MarketMock(id, location, name, offered, required, owner,
 					orders.toArray(new Exchangeable[orders.size()]));
 			return result;
 		}

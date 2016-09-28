@@ -11,6 +11,7 @@ import org.trading.exchange.publicInterfaces.Commodity;
 import org.trading.exchange.publicInterfaces.Exchangeable.State;
 import org.trading.exchange.publicInterfaces.Exchanged;
 import org.trading.exchange.publicInterfaces.Location;
+import org.trading.exchange.publicInterfaces.Owner;
 
 import java.util.Collection;
 
@@ -73,10 +74,13 @@ public class UniversalExchangeTest {
 		order2 = mock(Exchangeable.class);
 		order1 = setUp(order1, offered, required);
 		order2 = setUp(order2, offered, required);
+		Owner owner = mock(Owner.class);
 
 		orders = new CollectionOfExchangeableMock(order1, order2);
 		location = mock(Location.class);
-		requiredMarket = new MarketMock("requiredMarketId", location, "marketName", offered, required, order2, order1);
+		requiredMarket = new MarketMock.Builder<MarketMock>().setId("requiredMarketId").setLocation(location)
+				.setName("requiredMarketName").setOffered(offered).setRequired(required).setOwner(owner).accept(order2)
+				.accept(order1).build();
 		assertEquals(2, requiredMarket.getOrders().size());
 
 		order11 = mock(Exchangeable.class);
@@ -84,11 +88,12 @@ public class UniversalExchangeTest {
 		order11 = setUp(order11, offered, notRequired);
 		order12 = setUp(order12, offered, notRequired);
 		orders2 = new CollectionOfExchangeableMock(order11, order12);
-		notRequiredMarket =
-				new MarketMock("notRequiredMarketId", location, "marketName", offered, notRequired, order12, order11);
+		notRequiredMarket = new MarketMock.Builder<MarketMock>().setId("notRequiredMarketId").setLocation(location)
+				.setName("notRequiredMarketName").setOffered(offered).setRequired(notRequired).setOwner(owner)
+				.accept(order12).accept(order11).build();
 		assertEquals(2, notRequiredMarket.getOrders().size());
 
-		victim = new UniversalExchangeMock(name, strategy, true, requiredMarket, notRequiredMarket);
+		victim = new UniversalExchangeMock(name, strategy, owner, true, requiredMarket, notRequiredMarket);
 		assertEquals(2, victim.getMarkets().size());
 	}
 
@@ -110,9 +115,10 @@ public class UniversalExchangeTest {
 	@Test
 	public void getPlatform() throws Exception {
 		UniversalExchange platform = mock(UniversalExchange.class);
+		Owner owner = mock(Owner.class);
 
 		UniversalExchange test =
-				new UniversalExchangeMock(name, strategy, platform, true, requiredMarket, notRequiredMarket);
+				new UniversalExchangeMock(name, strategy, platform, owner, true, requiredMarket, notRequiredMarket);
 		assertEquals(platform, test.getPlatform());
 	}
 
@@ -275,8 +281,8 @@ public class UniversalExchangeTest {
 				orders.getCollection();
 		doReturn(matchedExchangeables).when(spyed).getMatching(exchangeable, spyed);
 
-		Exchanged result = spyed.postProcess(exchangeable, spyed,
-				matchedExchangeables.toArray(new Exchangeable[matchedExchangeables.size()]));
+		Exchangeable[] var = matchedExchangeables.toArray(new Exchangeable[matchedExchangeables.size()]);
+		Exchanged result = spyed.postProcess(exchangeable, spyed, var);
 		assertEquals(exchanged.getExchangeable(), result.getExchangeable());
 		assertEquals(matchedExchangeables, result.getMatchedExchangeables());
 	}

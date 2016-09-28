@@ -9,6 +9,7 @@ import org.trading.exchange.interfaces.mocks.UniversalExchangeMock;
 import org.trading.exchange.publicInterfaces.Commodity;
 import org.trading.exchange.publicInterfaces.Location;
 import org.trading.exchange.publicInterfaces.Market;
+import org.trading.exchange.publicInterfaces.Owner;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -72,7 +73,8 @@ public class UniversalExchangeIT {
 		UniversalExchange.Strategy strategy = new UniversalExchange.Strategy() {
 		};
 		Collection<Market> markets = new LinkedList<>();
-		victim = new UniversalExchangeMock(name, strategy, true);
+		Owner owner = mock(Owner.class);
+		victim = new UniversalExchangeMock(name, strategy, owner, true);
 	}
 
 	@After
@@ -391,7 +393,10 @@ public class UniversalExchangeIT {
 		long requiredValue = exchangeable.getOfferedValue();
 
 		// Setup a market to match the order
-		Market market = new MarketMock("MarketMock " + i, location, "MarketMock " + i, offered, required);
+		Owner owner = mock(Owner.class);
+		Market market = new MarketMock.Builder<MarketMock>().setId("MarketMock " + i).setLocation(location)
+				.setName("MarketMock " + i).setOffered(offered).setRequired(required).setOwner(owner)
+				.build();
 
 		market = victim.open(market);
 		assertEquals(victim.getMarkets().toString(), i + 1, victim.getMarkets().size());
