@@ -7,13 +7,13 @@
     <parent>
         <groupId>org.trading</groupId>
         <artifactId>universalExchangeArtifact</artifactId>
-        <version>1.0.3-SNAPSHOT</version>
+        <version>1.0.4-SNAPSHOT</version>
 
         <relativePath>../UniversalExchangeArtifact/pom.xml</relativePath>
     </parent>
 
     <artifactId>universalExchangeInterfaces</artifactId>
-    <!--<version>${version.dependencies}</version>-->
+    <version>${version.dependencies}</version>
 
     <properties>
     </properties>
