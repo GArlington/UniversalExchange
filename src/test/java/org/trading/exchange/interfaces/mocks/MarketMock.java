@@ -20,19 +20,22 @@ public class MarketMock implements Market {
 	private Commodity offered;
 	private Commodity required;
 	private Owner owner;
+	private boolean autoMatching;
 
-	private MarketMock(String id, Location location, String name, Commodity offered, Commodity required, Owner owner) {
+	private MarketMock(String id, Location location, String name, Commodity offered, Commodity required, Owner owner,
+					   boolean autoMatching) {
 		this.id = id;
 		this.location = location;
 		this.name = name;
 		this.offered = offered;
 		this.required = required;
 		this.owner = owner;
+		this.autoMatching = autoMatching;
 	}
 
 	private MarketMock(String id, Location location, String name, Commodity offered, Commodity required, Owner owner,
-					   Exchangeable... orders) {
-		this(id, location, name, offered, required, owner);
+					   boolean autoMatching, Exchangeable... orders) {
+		this(id, location, name, offered, required, owner, autoMatching);
 		for (Exchangeable exchangeable : orders) {
 			accept(exchangeable);
 		}
@@ -74,6 +77,10 @@ public class MarketMock implements Market {
 		return owner;
 	}
 
+	public boolean isAutoMatching() {
+		return autoMatching;
+	}
+
 	@Override
 	public boolean accept(Exchangeable exchangeable) {
 		if (validate(exchangeable)) {
@@ -112,6 +119,7 @@ public class MarketMock implements Market {
 		private Commodity offered;
 		private Commodity required;
 		private Owner owner;
+		private boolean autoMatching;
 
 		@Override
 		public Builder<T> setId(String s) {
@@ -157,10 +165,15 @@ public class MarketMock implements Market {
 			return this;
 		}
 
+		public Builder<T> setAutoMatching(boolean autoMatching) {
+			this.autoMatching = autoMatching;
+			return this;
+		}
+
 		@Override
 		public T build() {
 			@SuppressWarnings("unchecked")
-			T result = (T) new MarketMock(id, location, name, offered, required, owner,
+			T result = (T) new MarketMock(id, location, name, offered, required, owner, autoMatching,
 					orders.toArray(new Exchangeable[orders.size()]));
 			return result;
 		}

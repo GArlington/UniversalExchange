@@ -396,7 +396,7 @@ public class UniversalExchangeIT {
 		Owner owner = mock(Owner.class);
 		Market market = new MarketMock.Builder<MarketMock>().setId("MarketMock " + i).setLocation(location)
 				.setName("MarketMock " + i).setOffered(offered).setRequired(required).setOwner(owner)
-				.build();
+				.setAutoMatching(true).build();
 
 		market = victim.open(market);
 		assertEquals(victim.getMarkets().toString(), i + 1, victim.getMarkets().size());

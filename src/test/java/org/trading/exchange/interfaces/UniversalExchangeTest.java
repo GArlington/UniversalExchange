@@ -79,8 +79,8 @@ public class UniversalExchangeTest {
 		orders = new CollectionOfExchangeableMock(order1, order2);
 		location = mock(Location.class);
 		requiredMarket = new MarketMock.Builder<MarketMock>().setId("requiredMarketId").setLocation(location)
-				.setName("requiredMarketName").setOffered(offered).setRequired(required).setOwner(owner).accept(order2)
-				.accept(order1).build();
+				.setName("requiredMarketName").setOffered(offered).setRequired(required).setOwner(owner)
+				.setAutoMatching(true).accept(order2).accept(order1).build();
 		assertEquals(2, requiredMarket.getOrders().size());
 
 		order11 = mock(Exchangeable.class);
@@ -90,7 +90,7 @@ public class UniversalExchangeTest {
 		orders2 = new CollectionOfExchangeableMock(order11, order12);
 		notRequiredMarket = new MarketMock.Builder<MarketMock>().setId("notRequiredMarketId").setLocation(location)
 				.setName("notRequiredMarketName").setOffered(offered).setRequired(notRequired).setOwner(owner)
-				.accept(order12).accept(order11).build();
+				.setAutoMatching(true).accept(order12).accept(order11).build();
 		assertEquals(2, notRequiredMarket.getOrders().size());
 
 		victim = new UniversalExchangeMock(name, strategy, owner, true, requiredMarket, notRequiredMarket);
