@@ -1,11 +1,13 @@
 package org.trading.exchange.interfaces.mocks;
 
 import org.trading.exchange.interfaces.UniversalExchange;
-import org.trading.exchange.publicInterfaces.Exchangeable;
+import org.trading.exchange.publicInterfaces.ExchangeOffer;
 import org.trading.exchange.publicInterfaces.Exchanged;
 import org.trading.exchange.publicInterfaces.Market;
 import org.trading.exchange.publicInterfaces.Owner;
 
+import java.security.InvalidParameterException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.stream.Collectors;
@@ -78,6 +80,7 @@ public class UniversalExchangeMock implements UniversalExchange {
 
 	@Override
 	public Market validate(Market market, UniversalExchange platform) throws IllegalStateException {
+		market.validate();
 		if (platform.getMarkets().contains(market)) {
 			throw new IllegalStateException(market + " is already active on " + platform);
 		}
@@ -107,77 +110,86 @@ public class UniversalExchangeMock implements UniversalExchange {
 	}
 
 	@Override
-	public Exchangeable validate(Exchangeable exchangeable, UniversalExchange platform)
-			throws IllegalStateException {
-		return exchangeable.validate();
+	public ExchangeOffer validate(ExchangeOffer exchangeOffer, Market market, UniversalExchange platform)
+			throws InvalidParameterException, IllegalStateException {
+		if (!market.validate(exchangeOffer)) {
+			throw new InvalidParameterException(exchangeOffer + " can't be handled by " + market + " on " + platform);
+		}
+		return exchangeOffer.validate();
 	}
 
 	@Override
-	public Exchangeable accept(Exchangeable exchangeable, UniversalExchange platform)
+	public ExchangeOffer accept(ExchangeOffer exchangeOffer, Market market, UniversalExchange platform)
 			throws IllegalStateException {
-		Exchangeable temp = (Exchangeable) platform.validate(exchangeable, platform).preProcess();
-		if (isAutoMatching()) {
-			Collection<? extends Exchangeable> exchangeables = getMatching(temp, platform);
-			if (exchangeables.size() > 0) {
-				match(temp, platform, exchangeables.toArray(new Exchangeable[exchangeables.size()]));
-			}
-		}
-		for (Market market : platform.getMarkets(exchangeable)) {
-			if (market.validate(temp)) {
-				if (market.accept(temp)) {
-					temp = ((org.trading.exchange.interfaces.Exchangeable) temp).open();
-					return temp;
+		ExchangeOffer offer = (ExchangeOffer) platform.validate(exchangeOffer, market, platform).preProcess();
+		if (market.validate(offer)) {
+			if (isAutoMatching() && market.isAutoMatching()) {
+				Collection<? extends ExchangeOffer> offers = getMatching(offer, market, platform);
+				if (offers.size() > 0) {
+					match(offer, market, platform, offers.toArray(new ExchangeOffer[offers.size()]));
 				}
+			}
+			if (market.accept(offer)) {
+				return offer;
 			}
 		}
 		return null;
 	}
 
 	@Override
-	public Exchangeable process(Exchangeable exchangeable, UniversalExchange platform, Exchangeable... matching) {
-		return (Exchangeable) validate(exchangeable, platform).process();
+	public ExchangeOffer process(ExchangeOffer exchangeOffer, Market market, UniversalExchange platform,
+								 ExchangeOffer... matching) {
+		return (ExchangeOffer) validate(exchangeOffer, market, platform).process();
 	}
 
 	@Override
-	public Exchanged postProcess(Exchangeable exchangeable, UniversalExchange platform, Exchangeable... matching) {
-		org.trading.exchange.interfaces.Exchanged exchanged = mock(org.trading.exchange.interfaces.Exchanged.class);
-		doReturn(exchangeable).when(exchanged).getExchangeable();
-		doReturn(Stream.of(matching).collect(Collectors.toList())).when(exchanged).getMatchedExchangeables();
-		return exchanged;
+	public Exchanged postProcess(ExchangeOffer exchangeOffer, UniversalExchange platform, ExchangeOffer... matching) {
+		// TODO - maybe change asserts to more appropriate error handling method
+		assert exchangeOffer.getExchanged() != null;
+		assert exchangeOffer.getExchanged().getMatchedExchangeOffers().containsAll(Arrays.asList(matching));
+
+		return ((ExchangeOffer) exchangeOffer.postProcess()).getExchanged();
 	}
 
 	@Override
-	public Exchanged finalise(Exchangeable exchangeable, UniversalExchange platform, Exchangeable... matching) {
-		org.trading.exchange.interfaces.Exchanged exchanged = mock(org.trading.exchange.interfaces.Exchanged.class);
-		doReturn(exchangeable).when(exchanged).getExchangeable();
-		doReturn(Stream.of(matching).collect(Collectors.toList())).when(exchanged).getMatchedExchangeables();
-		return exchanged;
+	public Exchanged finalise(ExchangeOffer exchangeOffer, UniversalExchange platform, ExchangeOffer... matching) {
+		// TODO - maybe change asserts to more appropriate error handling method
+		assert exchangeOffer.getExchanged() != null;
+		assert exchangeOffer.getExchanged().getMatchedExchangeOffers().containsAll(Arrays.asList(matching));
+
+		return ((ExchangeOffer) exchangeOffer.finalise()).getExchanged();
 	}
 
 	@Override
-	public Collection<? extends Exchangeable> getMatching(Exchangeable exchangeable, UniversalExchange platform) {
-		Collection<Exchangeable> orders = new LinkedList<>();
-		platform.getMarkets().stream()
-				.filter(market -> market.validate(exchangeable))
-				.map(market -> market.getOrders(Exchangeable.State.OPEN))
-				.forEach(orders::addAll);
-		return orders.stream().filter(e -> e.isMatching(exchangeable)).collect(Collectors.toList());
+	public Collection<? extends ExchangeOffer> getMatching(ExchangeOffer exchangeOffer, Market market,
+														   UniversalExchange platform) {
+		if (market.validate(exchangeOffer)) {
+			return market.getOffers(ExchangeOffer.State.OPEN).stream().filter(offer -> offer.isMatching(exchangeOffer))
+					.collect(Collectors.toList());
+		}
+		return new LinkedList<>();
 	}
 
 	@Override
-	public Exchanged match(Exchangeable exchangeable, UniversalExchange platform, Exchangeable... matching) {
-		Collection<Exchangeable> matchedOrders = new LinkedList<>();
-		Stream.of(matching)
-				.filter(order -> (!Exchangeable.State.OPEN.precedes(order.getExchangeableState()) &&
-						order.getOffered().equals(exchangeable.getRequired()) &&
-						order.getRequired().equals(exchangeable.getOffered())))
-				.map(order -> (org.trading.exchange.interfaces.Exchangeable) order)
-				.sorted(comparing(org.trading.exchange.interfaces.Exchangeable::getExchangeRate))
-				.forEach(order -> matchedOrders.add(exchangeable.match(order)));
-		org.trading.exchange.interfaces.Exchanged exchanged = mock(org.trading.exchange.interfaces.Exchanged.class);
-		doReturn(exchangeable).when(exchanged).getExchangeable();
-		doReturn(matchedOrders).when(exchanged).getMatchedExchangeables();
-		return exchanged;
+	public Exchanged match(ExchangeOffer exchangeOffer, Market market, UniversalExchange platform,
+						   ExchangeOffer... matching) {
+		if (market.validate(exchangeOffer)) {
+			Collection<ExchangeOffer> matched = new LinkedList<>();
+			Stream.of(matching)
+					.filter(market::validate)
+					.filter(offer -> (!ExchangeOffer.State.OPEN.precedes(offer.getState()) &&
+							offer.isMatching(exchangeOffer)))
+					.map(offer -> (org.trading.exchange.interfaces.ExchangeOffer) offer)
+					.sorted(comparing(org.trading.exchange.interfaces.ExchangeOffer::getExchangeRate))
+					.forEach(offer -> matched.add(exchangeOffer.match(offer)));
+			org.trading.exchange.interfaces.Exchanged exchanged = mock(org.trading.exchange.interfaces.Exchanged
+					.class);
+
+			doReturn(exchangeOffer).when(exchanged).getExchangeOffer();
+			doReturn(matched).when(exchanged).getMatchedExchangeOffers();
+			return exchanged;
+		}
+		return null;
 	}
 
 	@Override

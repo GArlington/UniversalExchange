@@ -9,7 +9,7 @@
         <artifactId>universalExchangeArtifact</artifactId>
         <version>1.0.4-SNAPSHOT</version>
 
-        <relativePath>../UniversalExchangeArtifact/pom.xml</relativePath>
+        <relativePath>../UniversalExchange/pom.xml</relativePath>
     </parent>
 
     <artifactId>universalExchangeInterfaces</artifactId>

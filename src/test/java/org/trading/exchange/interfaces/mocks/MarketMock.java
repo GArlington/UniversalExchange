@@ -2,7 +2,7 @@ package org.trading.exchange.interfaces.mocks;
 
 import org.trading.exchange.interfaces.Market;
 import org.trading.exchange.publicInterfaces.Commodity;
-import org.trading.exchange.publicInterfaces.Exchangeable;
+import org.trading.exchange.publicInterfaces.ExchangeOffer;
 import org.trading.exchange.publicInterfaces.Location;
 import org.trading.exchange.publicInterfaces.Owner;
 
@@ -13,7 +13,7 @@ import java.util.LinkedList;
  * Created by GArlington.
  */
 public class MarketMock implements Market {
-	private final Collection<? extends Exchangeable> orders = new LinkedList<>();
+	private final Collection<? extends ExchangeOffer> offers = new LinkedList<>();
 	private String id;
 	private Location location;
 	private String name;
@@ -34,10 +34,10 @@ public class MarketMock implements Market {
 	}
 
 	private MarketMock(String id, Location location, String name, Commodity offered, Commodity required, Owner owner,
-					   boolean autoMatching, Exchangeable... orders) {
+					   boolean autoMatching, ExchangeOffer... offers) {
 		this(id, location, name, offered, required, owner, autoMatching);
-		for (Exchangeable exchangeable : orders) {
-			accept(exchangeable);
+		for (ExchangeOffer exchangeOffer : offers) {
+			accept(exchangeOffer);
 		}
 		validate();
 	}
@@ -67,9 +67,8 @@ public class MarketMock implements Market {
 		return required;
 	}
 
-	@Override
-	public Collection<? extends Exchangeable> getOrders() {
-		return orders;
+	public Collection<? extends ExchangeOffer> getOffers() {
+		return offers;
 	}
 
 	@Override
@@ -82,12 +81,13 @@ public class MarketMock implements Market {
 	}
 
 	@Override
-	public boolean accept(Exchangeable exchangeable) {
-		if (validate(exchangeable)) {
-			synchronized (orders) {
+	public boolean accept(ExchangeOffer exchangeOffer) {
+		if (validate(exchangeOffer)) {
+			synchronized (getOffers()) {
 				@SuppressWarnings("unchecked")
-				Collection<Exchangeable> orders = (Collection<Exchangeable>) this.orders;
-				return orders.add(((org.trading.exchange.interfaces.Exchangeable) exchangeable).open());
+				Collection<org.trading.exchange.interfaces.ExchangeOffer> offers =
+						(Collection<org.trading.exchange.interfaces.ExchangeOffer>) getOffers();
+				return offers.add(((org.trading.exchange.interfaces.ExchangeOffer) exchangeOffer).open());
 			}
 		}
 		return false;
@@ -106,13 +106,13 @@ public class MarketMock implements Market {
 				", \noffered=" + offered +
 				", \nrequired=" + required +
 				", \nlocation=" + location +
-				", \norders=\n" + getOrders() +
-				", \nOPEN orders=\n" + getOrders(Exchangeable.State.OPEN) +
+				", \noffers=\n" + getOffers() +
+				", \nOPEN offers=\n" + getOffers(ExchangeOffer.State.OPEN) +
 				'}' + '\n' + '\n';
 	}
 
 	public static class Builder<T> implements org.trading.exchange.publicInterfaces.Market.Builder {
-		private Collection<? extends Exchangeable> orders = new LinkedList<>();
+		private Collection<? extends ExchangeOffer> offers = new LinkedList<>();
 		private String id;
 		private Location location;
 		private String name;
@@ -152,10 +152,10 @@ public class MarketMock implements Market {
 		}
 
 		@Override
-		public Builder<T> accept(Exchangeable exchangeable) {
+		public Builder<T> accept(ExchangeOffer exchangeOffer) {
 			@SuppressWarnings("unchecked")
-			Collection<Exchangeable> orders = (Collection<Exchangeable>) this.orders;
-			orders.add(exchangeable);
+			Collection<ExchangeOffer> orders = (Collection<ExchangeOffer>) this.offers;
+			orders.add(exchangeOffer);
 			return this;
 		}
 
@@ -174,7 +174,7 @@ public class MarketMock implements Market {
 		public T build() {
 			@SuppressWarnings("unchecked")
 			T result = (T) new MarketMock(id, location, name, offered, required, owner, autoMatching,
-					orders.toArray(new Exchangeable[orders.size()]));
+					offers.toArray(new ExchangeOffer[offers.size()]));
 			return result;
 		}
 	}

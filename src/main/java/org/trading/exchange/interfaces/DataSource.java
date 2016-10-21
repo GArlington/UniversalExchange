@@ -17,13 +17,13 @@ public interface DataSource {
 		return getObject(getKeys(filter), filter);
 	}
 
-	<K, T> T getObject(K key, T filter);
+	<K, T> T getObject(Collection<K> key, T filter);
 
 	default <T> T putObject(T object) {
 		return putObject(getKeys(object), object);
 	}
 
-	<K, T> T putObject(K key, T object);
+	<K, T> T putObject(Collection<K> key, T object);
 
 	<T> T deleteObject(T object);
 
