@@ -81,21 +81,12 @@ public class MarketMock implements Market {
 	}
 
 	@Override
-	public boolean accept(ExchangeOffer exchangeOffer) {
-		if (validate(exchangeOffer)) {
-			synchronized (getOffers()) {
-				@SuppressWarnings("unchecked")
-				Collection<org.trading.exchange.interfaces.ExchangeOffer> offers =
-						(Collection<org.trading.exchange.interfaces.ExchangeOffer>) getOffers();
-				return offers.add(((org.trading.exchange.interfaces.ExchangeOffer) exchangeOffer).open());
-			}
+	public ExchangeOffer accept(ExchangeOffer exchangeOffer) {
+		exchangeOffer = org.trading.exchange.interfaces.Market.super.accept(exchangeOffer);
+		if (exchangeOffer != null) {
+			exchangeOffer = ((org.trading.exchange.interfaces.ExchangeOffer) exchangeOffer).open();
 		}
-		return false;
-	}
-
-	@Override
-	public boolean validate() throws IllegalStateException {
-		return true;
+		return exchangeOffer;
 	}
 
 	@Override

@@ -129,9 +129,7 @@ public class UniversalExchangeMock implements UniversalExchange {
 					match(offer, market, platform, offers.toArray(new ExchangeOffer[offers.size()]));
 				}
 			}
-			if (market.accept(offer)) {
-				return offer;
-			}
+			return market.accept(offer);
 		}
 		return null;
 	}
