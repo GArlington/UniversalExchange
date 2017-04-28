@@ -36,20 +36,13 @@ public interface ExchangeOffer extends org.trading.exchange.publicInterfaces.Exc
 	SimpleDecimal getInverseExchangeRate();
 
 	@Override
-	default org.trading.exchange.interfaces.ExchangeOffer validate() throws IllegalStateException {
-		org.trading.exchange.publicInterfaces.ExchangeOffer.validate(this);
-		return this;
-	}
-
-	@Override
 	default boolean isFullyMatched() {
-		return (getOfferedValue() <= 0 || getRequiredValue() <= 0);
+		return getOfferedValue() <= 0;
 	}
 
 	@Override
-	default org.trading.exchange.interfaces.ExchangeOffer match(
-			org.trading.exchange.publicInterfaces.ExchangeOffer exchangeOffer) {
-		return match((org.trading.exchange.interfaces.ExchangeOffer) exchangeOffer);
+	default ExchangeOffer match(org.trading.exchange.publicInterfaces.ExchangeOffer exchangeOffer) {
+		return match((ExchangeOffer) exchangeOffer);
 	}
 
 	/**
@@ -57,11 +50,8 @@ public interface ExchangeOffer extends org.trading.exchange.publicInterfaces.Exc
 	 *
 	 * @param exchangeOffer
 	 */
-	default boolean isFullyMatched(org.trading.exchange.interfaces.ExchangeOffer exchangeOffer) {
-		return (isPartiallyMatched(exchangeOffer) && getOfferedValue() <= exchangeOffer.getRequiredValue()
-				// TODO - this check may be redundant
-				&& getRequiredValue() <= exchangeOffer.getOfferedValue()
-		);
+	default boolean isFullyMatched(ExchangeOffer exchangeOffer) {
+		return (isPartiallyMatched(exchangeOffer) && getOfferedValue() <= exchangeOffer.getRequiredValue());
 	}
 
 	/**
@@ -69,7 +59,7 @@ public interface ExchangeOffer extends org.trading.exchange.publicInterfaces.Exc
 	 *
 	 * @param exchangeOffer
 	 */
-	default boolean isPartiallyMatched(org.trading.exchange.interfaces.ExchangeOffer exchangeOffer) {
+	default boolean isPartiallyMatched(ExchangeOffer exchangeOffer) {
 		return (!State.OPEN.precedes(exchangeOffer.getState())
 				&& getOffered().equals(exchangeOffer.getRequired()) && getRequired().equals(exchangeOffer.getOffered())
 				&& getExchangeRate().compareTo(exchangeOffer.getInverseExchangeRate()) <= 0
@@ -84,8 +74,7 @@ public interface ExchangeOffer extends org.trading.exchange.publicInterfaces.Exc
 	 * @param exchangeOffer
 	 * @return processed ExchangeOffer that was passed as parameter
 	 */
-	default org.trading.exchange.interfaces.ExchangeOffer match(
-			org.trading.exchange.interfaces.ExchangeOffer exchangeOffer) {
+	default ExchangeOffer match(ExchangeOffer exchangeOffer) {
 		if (isPartiallyMatched(exchangeOffer)) {
 			if (!State.OPEN.precedes(getState())) {
 				synchronized (getLock()) {
@@ -108,8 +97,7 @@ public interface ExchangeOffer extends org.trading.exchange.publicInterfaces.Exc
 		return null;
 	}
 
-	default org.trading.exchange.interfaces.ExchangeOffer processAndFinalise(
-			org.trading.exchange.interfaces.ExchangeOffer exchangeOffer, long oValue, long rValue) {
+	default ExchangeOffer processAndFinalise(ExchangeOffer exchangeOffer, long oValue, long rValue) {
 		exchangeOffer.matchOfferedValue(oValue);
 		exchangeOffer.matchRequiredValue(rValue);
 		if (exchangeOffer.isFullyMatched()) {
@@ -151,12 +139,12 @@ public interface ExchangeOffer extends org.trading.exchange.publicInterfaces.Exc
 		return this;
 	}
 
-	default org.trading.exchange.interfaces.ExchangeOffer open() {
+	default ExchangeOffer open() {
 		setState(State.OPEN);
 		return this;
 	}
 
-	default org.trading.exchange.interfaces.ExchangeOffer dealt() {
+	default ExchangeOffer dealt() {
 		setState(State.DEALT);
 		return this;
 	}
