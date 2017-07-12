@@ -10,6 +10,7 @@ import java.security.InvalidParameterException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -22,6 +23,7 @@ import static org.mockito.Mockito.mock;
  * Created by GArlington.
  */
 public class UniversalExchangeMock implements UniversalExchange {
+	private String id;
 	private String name;
 	private Strategy strategy;
 	private Collection<? extends Market> markets = new LinkedList<>();
@@ -31,6 +33,7 @@ public class UniversalExchangeMock implements UniversalExchange {
 
 	public UniversalExchangeMock(String name, Strategy strategy, Owner owner, boolean autoMatching, Market...
 			markets) {
+		this.id = UUID.randomUUID().toString();
 		this.platform = this;
 		this.name = name;
 		this.strategy = strategy;
@@ -46,6 +49,11 @@ public class UniversalExchangeMock implements UniversalExchange {
 								 Market... markets) {
 		this(name, strategy, owner, autoMatching, markets);
 		this.platform = platform;
+	}
+
+	@Override
+	public String getId() {
+		return id;
 	}
 
 	@Override

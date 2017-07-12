@@ -7,6 +7,8 @@ import org.trading.exchange.publicInterfaces.Commodity;
 import org.trading.exchange.publicInterfaces.Exchanged;
 import org.trading.exchange.publicInterfaces.Owner;
 
+import java.util.UUID;
+
 /**
  * Created by GArlington.
  */
@@ -19,6 +21,7 @@ public class ExchangeOfferMock implements ExchangeOffer {
 	private final SimpleDecimal exchangeRate;
 	private final SimpleDecimal inverseExchangeRate;
 	private final Owner owner;
+	private String id;
 	private long offeredValue;
 	private long matchedOfferedValue;
 	private long requiredValue;
@@ -35,6 +38,7 @@ public class ExchangeOfferMock implements ExchangeOffer {
 
 	ExchangeOfferMock(Commodity offered, long offeredValue, Commodity required, long requiredValue, Owner owner,
 					  int exchangeRatePrecision) {
+		this.id = UUID.randomUUID().toString();
 		this.exchangeRatePrecision = exchangeRatePrecision;
 		this.offered = offered;
 		this.originalOfferedValue = this.offeredValue = offeredValue;
@@ -52,6 +56,11 @@ public class ExchangeOfferMock implements ExchangeOffer {
 
 	public static Builder<ExchangeOffer> getBuilder() {
 		return new Builder<>();
+	}
+
+	@Override
+	public String getId() {
+		return id;
 	}
 
 	@Override
