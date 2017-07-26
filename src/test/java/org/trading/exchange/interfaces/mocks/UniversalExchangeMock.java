@@ -77,6 +77,11 @@ public class UniversalExchangeMock implements UniversalExchange {
 	}
 
 	@Override
+	public <T extends ExchangeOffer> T createCounterOffer(T exchangeOffer, int margin) {
+		return null;
+	}
+
+	@Override
 	public Strategy getStrategy() {
 		return strategy;
 	}
@@ -184,8 +189,7 @@ public class UniversalExchangeMock implements UniversalExchange {
 			Stream.of(matching)
 					.filter(market::validate)
 					.filter(offer -> (!ExchangeOffer.State.OPEN.precedes(offer.getState()) &&
-							offer.isMatching(exchangeOffer)))
-					.map(offer -> (org.trading.exchange.interfaces.ExchangeOffer) offer)
+							offer.isMatching(exchangeOffer))).map(org.trading.exchange.interfaces.ExchangeOffer.class::cast)
 					.sorted(comparing(org.trading.exchange.interfaces.ExchangeOffer::getExchangeRate))
 					.forEach(offer -> matched.add(exchangeOffer.match(offer)));
 			org.trading.exchange.interfaces.Exchanged exchanged = mock(org.trading.exchange.interfaces.Exchanged

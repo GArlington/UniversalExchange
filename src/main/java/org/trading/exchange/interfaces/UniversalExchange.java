@@ -5,7 +5,9 @@ import org.trading.exchange.publicInterfaces.Exchanged;
 import org.trading.exchange.publicInterfaces.Market;
 
 import java.security.InvalidParameterException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * UniversalExchange will provide Exchange functionality
@@ -152,6 +154,17 @@ public interface UniversalExchange extends org.trading.exchange.publicInterfaces
 	Collection<? extends ExchangeOffer> getMatching(ExchangeOffer exchangeOffer, Market market, UniversalExchange
 			platform);
 
+	/**
+	 * Get matching orders implementation
+	 *
+	 * @param exchangeOffer
+	 * @param markets
+	 * @param maxChainDepth
+	 * @return
+	 */
+	default List<? extends ExchangeOffer> getCrossMarketsOffers(ExchangeOffer exchangeOffer, Collection<? extends Market> markets, int maxChainDepth) {
+		return new ArrayList<>();
+	}
 
 	/**
 	 * Process ExchangeOffer with matched orders implementation

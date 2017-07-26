@@ -32,24 +32,21 @@ public class ExchangeOfferMock implements ExchangeOffer {
 	private int exchangeRatePrecision;
 
 	ExchangeOfferMock(ExchangeOffer exchangeOffer) {
-		this(exchangeOffer.getOffered(), exchangeOffer.getOfferedValue(), exchangeOffer.getRequired(),
-				exchangeOffer.getRequiredValue(), exchangeOffer.getOwner(), exchangeOffer.getExchangeRatePrecision());
+		this(exchangeOffer.getOffered(), exchangeOffer.getOfferedValue(), exchangeOffer.getRequired(), exchangeOffer.getRequiredValue(),
+			 exchangeOffer.getOwner(), exchangeOffer.getExchangeRatePrecision());
 	}
 
-	ExchangeOfferMock(Commodity offered, long offeredValue, Commodity required, long requiredValue, Owner owner,
-					  int exchangeRatePrecision) {
+	ExchangeOfferMock(Commodity offered, long offeredValue, Commodity required, long requiredValue, Owner owner, int exchangeRatePrecision) {
 		this.id = UUID.randomUUID().toString();
 		this.exchangeRatePrecision = exchangeRatePrecision;
 		this.offered = offered;
 		this.originalOfferedValue = this.offeredValue = offeredValue;
 		this.required = required;
 		this.originalRequiredValue = this.requiredValue = requiredValue;
-		this.exchangeRate =
-				new SimpleDecimal(getOriginalRequiredValue()).incFractionalPrecision(getExchangeRatePrecision())
-						.divide(new SimpleDecimal(getOriginalOfferedValue()));
-		this.inverseExchangeRate =
-				new SimpleDecimal(getOriginalOfferedValue()).incFractionalPrecision(getExchangeRatePrecision())
-						.divide(new SimpleDecimal(getOriginalRequiredValue()));
+		this.exchangeRate = new SimpleDecimal(getOriginalRequiredValue()).incFractionalPrecision(getExchangeRatePrecision())
+				.divide(new SimpleDecimal(getOriginalOfferedValue()));
+		this.inverseExchangeRate = new SimpleDecimal(getOriginalOfferedValue()).incFractionalPrecision(getExchangeRatePrecision())
+				.divide(new SimpleDecimal(getOriginalRequiredValue()));
 		this.owner = owner;
 		initialise();
 	}
@@ -170,20 +167,10 @@ public class ExchangeOfferMock implements ExchangeOffer {
 
 	@Override
 	public String toString() {
-		return "ExchangeOfferMock{" +
-				"state=" + state +
-				", processState=" + processState +
-				", offered=" + offered +
-				", offeredValue=" + offeredValue +
-				", exchangeRate=" + getExchangeRate() +
-				", originalOfferedValue=" + originalOfferedValue +
-				", matchedOfferedValue=" + matchedOfferedValue +
-				", required=" + required +
-				", requiredValue=" + requiredValue +
-				", inverseExchangeRate=" + getInverseExchangeRate() +
-				", originalRequiredValue=" + originalRequiredValue +
-				", matchedRequiredValue=" + matchedRequiredValue +
-				'}' + '\n';
+		return "ExchangeOfferMock{" + "state=" + state + ", processState=" + processState + ", offered=" + offered + ", offeredValue=" + offeredValue +
+				", exchangeRate=" + getExchangeRate() + ", originalOfferedValue=" + originalOfferedValue + ", matchedOfferedValue=" + matchedOfferedValue +
+				", required=" + required + ", requiredValue=" + requiredValue + ", inverseExchangeRate=" + getInverseExchangeRate() +
+				", originalRequiredValue=" + originalRequiredValue + ", matchedRequiredValue=" + matchedRequiredValue + '}' + '\n';
 	}
 
 	public static class Builder<T> implements ExchangeOffer.Builder {
