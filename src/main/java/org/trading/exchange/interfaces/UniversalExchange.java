@@ -1,5 +1,6 @@
 package org.trading.exchange.interfaces;
 
+import org.trading.exchange.publicInterfaces.Commodity;
 import org.trading.exchange.publicInterfaces.ExchangeOffer;
 import org.trading.exchange.publicInterfaces.Exchanged;
 import org.trading.exchange.publicInterfaces.Market;
@@ -96,8 +97,7 @@ public interface UniversalExchange extends org.trading.exchange.publicInterfaces
 	 * @throws InvalidParameterException
 	 * @throws IllegalStateException
 	 */
-	ExchangeOffer validate(ExchangeOffer exchangeOffer, Market market, UniversalExchange platform)
-			throws InvalidParameterException, IllegalStateException;
+	ExchangeOffer validate(ExchangeOffer exchangeOffer, Market market, UniversalExchange platform) throws InvalidParameterException, IllegalStateException;
 
 	/**
 	 * Accept ExchangeOffer implementation
@@ -108,8 +108,7 @@ public interface UniversalExchange extends org.trading.exchange.publicInterfaces
 	 * @return
 	 * @throws IllegalStateException
 	 */
-	ExchangeOffer accept(ExchangeOffer exchangeOffer, Market market, UniversalExchange platform)
-			throws IllegalStateException;
+	ExchangeOffer accept(ExchangeOffer exchangeOffer, Market market, UniversalExchange platform) throws IllegalStateException;
 
 	/**
 	 * Process ExchangeOffer implementation
@@ -120,8 +119,7 @@ public interface UniversalExchange extends org.trading.exchange.publicInterfaces
 	 * @param matching
 	 * @return
 	 */
-	ExchangeOffer process(ExchangeOffer exchangeOffer, Market market, UniversalExchange platform, ExchangeOffer...
-			matching);
+	ExchangeOffer process(ExchangeOffer exchangeOffer, Market market, UniversalExchange platform, ExchangeOffer... matching);
 
 	/**
 	 * PostProcess ExchangeOffer implementation
@@ -144,25 +142,31 @@ public interface UniversalExchange extends org.trading.exchange.publicInterfaces
 	Exchanged finalise(ExchangeOffer exchangeOffer, UniversalExchange platform, ExchangeOffer... matching);
 
 	/**
-	 * Get matching orders implementation
+	 * Get matching exchangeOffers implementation
 	 *
 	 * @param exchangeOffer
 	 * @param market
 	 * @param platform
 	 * @return
 	 */
-	Collection<? extends ExchangeOffer> getMatching(ExchangeOffer exchangeOffer, Market market, UniversalExchange
-			platform);
+	Collection<? extends ExchangeOffer> getMatching(ExchangeOffer exchangeOffer, Market market, UniversalExchange platform);
 
 	/**
-	 * Get matching orders implementation
+	 * Get matching cross markets exchangeOffers implementation
 	 *
-	 * @param exchangeOffer
+	 * This method will return a Collection of existing ExchangeOffers which will be able to complete a chain of exchanges between
+	 * #fromCommodity and #toCommodity
+	 * across Markets
+	 * up to the maxChainDepth
+	 *
+	 * @param fromCommodity
+	 * @param toCommodity
 	 * @param markets
 	 * @param maxChainDepth
 	 * @return
 	 */
-	default List<? extends ExchangeOffer> getCrossMarketsOffers(ExchangeOffer exchangeOffer, Collection<? extends Market> markets, int maxChainDepth) {
+	default List<? extends ExchangeOffer> getCrossMarketsOffers(Commodity fromCommodity, Commodity toCommodity, Collection<? extends Market> markets,
+																int maxChainDepth) {
 		return new ArrayList<>();
 	}
 
@@ -181,8 +185,7 @@ public interface UniversalExchange extends org.trading.exchange.publicInterfaces
 	 * Default strategy is to pass all functionality directly to platform specific implementation
 	 */
 	interface Strategy {
-		default Market validate(Market market, UniversalExchange platform)
-				throws InvalidParameterException {
+		default Market validate(Market market, UniversalExchange platform) throws InvalidParameterException {
 			return platform.validate(market, platform);
 		}
 
@@ -194,8 +197,7 @@ public interface UniversalExchange extends org.trading.exchange.publicInterfaces
 			return platform.close(market, platform);
 		}
 
-		default ExchangeOffer validate(ExchangeOffer exchangeOffer, Market market, UniversalExchange platform)
-				throws IllegalStateException {
+		default ExchangeOffer validate(ExchangeOffer exchangeOffer, Market market, UniversalExchange platform) throws IllegalStateException {
 			return platform.validate(exchangeOffer, market, platform);
 		}
 
@@ -203,33 +205,27 @@ public interface UniversalExchange extends org.trading.exchange.publicInterfaces
 			return platform.accept(exchangeOffer, market, platform);
 		}
 
-		default Exchanged match(ExchangeOffer exchangeOffer, Market market, UniversalExchange platform,
-								ExchangeOffer... matching) {
+		default Exchanged match(ExchangeOffer exchangeOffer, Market market, UniversalExchange platform, ExchangeOffer... matching) {
 			return platform.match(exchangeOffer, market, platform, matching);
 		}
 
 		default ExchangeOffer process(ExchangeOffer exchangeOffer, Market market, UniversalExchange platform) {
-			return process(exchangeOffer, market, platform,
-					getMatching(exchangeOffer, market, platform).toArray(new ExchangeOffer[1]));
+			return process(exchangeOffer, market, platform, getMatching(exchangeOffer, market, platform).toArray(new ExchangeOffer[1]));
 		}
 
-		default ExchangeOffer process(ExchangeOffer exchangeOffer, Market market, UniversalExchange platform,
-									  ExchangeOffer... matching) {
+		default ExchangeOffer process(ExchangeOffer exchangeOffer, Market market, UniversalExchange platform, ExchangeOffer... matching) {
 			return platform.process(exchangeOffer, market, platform, matching);
 		}
 
-		default Exchanged postProcess(ExchangeOffer exchangeOffer, UniversalExchange platform, ExchangeOffer...
-				matching) {
+		default Exchanged postProcess(ExchangeOffer exchangeOffer, UniversalExchange platform, ExchangeOffer... matching) {
 			return platform.postProcess((ExchangeOffer) exchangeOffer.postProcess(), platform, matching);
 		}
 
-		default Exchanged finalise(ExchangeOffer exchangeOffer, UniversalExchange platform, ExchangeOffer...
-				matching) {
+		default Exchanged finalise(ExchangeOffer exchangeOffer, UniversalExchange platform, ExchangeOffer... matching) {
 			return platform.finalise((ExchangeOffer) exchangeOffer.finalise(), platform, matching);
 		}
 
-		default Collection<? extends ExchangeOffer> getMatching(ExchangeOffer exchangeOffer, Market market,
-																UniversalExchange platform) {
+		default Collection<? extends ExchangeOffer> getMatching(ExchangeOffer exchangeOffer, Market market, UniversalExchange platform) {
 			return platform.getMatching(exchangeOffer, market, platform);
 		}
 	}
