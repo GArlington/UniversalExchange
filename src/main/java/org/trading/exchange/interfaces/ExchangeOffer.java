@@ -25,14 +25,10 @@ public interface ExchangeOffer extends org.trading.exchange.publicInterfaces.Exc
 	 */
 	void matchRequiredValue(long requiredValue);
 
-	/**
-	 * Get exchange rate
-	 */
+	@Override
 	SimpleDecimal getExchangeRate();
 
-	/**
-	 * Get inverse exchange rate
-	 */
+	@Override
 	SimpleDecimal getInverseExchangeRate();
 
 	@Override
