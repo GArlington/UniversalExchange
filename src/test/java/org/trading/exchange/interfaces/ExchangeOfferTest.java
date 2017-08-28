@@ -36,9 +36,8 @@ public class ExchangeOfferTest {
 		owner = mock(Owner.class);
 		doReturn("thisId").when(owner).getId();
 		doReturn(true).when(owner).equals(owner);
-		victim = ExchangeOfferMock.getBuilder()
-				.setOffered(offered).setOfferedValue(offeredValue)
-				.setRequired(required).setRequiredValue(requiredValue).setOwner(owner).build();
+		victim = ExchangeOfferMock.getBuilder().setOffered(offered).setOfferedValue(offeredValue).setRequired(required).setRequiredValue(requiredValue)
+				.setOwner(owner).build();
 		assertEquals(new SimpleDecimal(((double) requiredValue / offeredValue)), victim.getExchangeRate());
 		assertEquals(new SimpleDecimal((double) offeredValue / requiredValue), victim.getInverseExchangeRate());
 	}
@@ -69,87 +68,71 @@ public class ExchangeOfferTest {
 	public void isPartiallyMatchedByExchangeOffer() throws Exception {
 		ExchangeOffer existingOffer = createPartiallyMatchingOffer(victim);
 
-		assertEquals(victim + " is not partially matched by " + existingOffer,
-				true, victim.isPartiallyMatched(existingOffer));
-		assertEquals(victim + " is fully matched by " + existingOffer,
-				false, victim.isFullyMatched(existingOffer));
+		assertEquals(victim + " is not partially matched by " + existingOffer, true, victim.isPartiallyMatched(existingOffer));
+		assertEquals(victim + " is fully matched by " + existingOffer, false, victim.isFullyMatched(existingOffer));
 	}
 
 	@Test
 	public void isFullyMatchedByExchangeOffer() throws Exception {
 		ExchangeOffer existingOffer = createFullyMatchingOffer(victim);
 
-		assertEquals(victim + " is not fully matched by " + existingOffer,
-				true, victim.isFullyMatched(existingOffer));
-		assertEquals(existingOffer + " is not fully matched by " + victim,
-				true, existingOffer.isFullyMatched(victim));
+		assertEquals(victim + " is not fully matched by " + existingOffer, true, victim.isFullyMatched(existingOffer));
+		assertEquals(existingOffer + " is not fully matched by " + victim, true, existingOffer.isFullyMatched(victim));
 	}
 
 	@Test
 	public void matchPartially() throws Exception {
 		ExchangeOffer existingOffer = createPartiallyMatchingOffer(victim);
 
-		assertEquals(victim + " is not partially matched by " + existingOffer,
-				true, victim.isPartiallyMatched(existingOffer));
+		assertEquals(victim + " is not partially matched by " + existingOffer, true, victim.isPartiallyMatched(existingOffer));
 
 		assertEquals(existingOffer, victim.match(existingOffer));
-		assertEquals(existingOffer + " is not fully matched by " + victim,
-				true, existingOffer.isFullyMatched());
-		assertEquals(victim + " is fully matched by " + existingOffer,
-				false, victim.isFullyMatched());
+		assertEquals(existingOffer + " is not fully matched by " + victim, true, existingOffer.isFullyMatched());
+		assertEquals(victim + " is fully matched by " + existingOffer, false, victim.isFullyMatched());
 	}
 
 	@Test
 	public void matchFully() throws Exception {
 		ExchangeOffer existingOffer = createFullyMatchingOffer(victim);
 
-		assertEquals(victim + " is not fully matched by " + existingOffer,
-				true, victim.isFullyMatched(existingOffer));
+		assertEquals(victim + " is not fully matched by " + existingOffer, true, victim.isFullyMatched(existingOffer));
 
 		assertEquals(existingOffer, victim.match(existingOffer));
-		assertEquals(existingOffer + " is not fully matched by " + victim,
-				true, existingOffer.isFullyMatched());
-		assertEquals(victim + " is not fully matched by " + existingOffer,
-				true, victim.isFullyMatched());
+		assertEquals(existingOffer + " is not fully matched by " + victim, true, existingOffer.isFullyMatched());
+		assertEquals(victim + " is not fully matched by " + existingOffer, true, victim.isFullyMatched());
 	}
 
 	@Test
 	public void matchFullyWithExistingExcessiveOffer() throws Exception {
 		ExchangeOffer existingOffer = createExcessiveMatchingOffer(victim);
 
-		assertEquals(victim + " is not fully matched by " + existingOffer,
-				true, victim.isFullyMatched(existingOffer));
+		assertEquals(victim + " is not fully matched by " + existingOffer, true, victim.isFullyMatched(existingOffer));
 
 		assertEquals(existingOffer, victim.match(existingOffer));
-		assertEquals(existingOffer + " is fully matched by " + victim,
-				false, existingOffer.isFullyMatched());
-		assertEquals(victim + " is not fully matched by " + existingOffer,
-				true, victim.isFullyMatched());
+		assertEquals(existingOffer + " is fully matched by " + victim, false, existingOffer.isFullyMatched());
+		assertEquals(victim + " is not fully matched by " + existingOffer, true, victim.isFullyMatched());
 	}
 
 	private ExchangeOffer createPartiallyMatchingOffer(ExchangeOffer victim) {
-		ExchangeOffer existingOffer = ExchangeOfferMock.getBuilder()
-				.setOffered(victim.getRequired()).setOfferedValue(victim.getRequiredValue())
-				.setRequired(victim.getOffered()).setRequiredValue(victim.getOfferedValue() - 1)
-				.setOwner(owner).build();
+		ExchangeOffer existingOffer =
+				ExchangeOfferMock.getBuilder().setOffered(victim.getRequired()).setOfferedValue(victim.getRequiredValue()).setRequired(victim.getOffered())
+						.setRequiredValue(victim.getOfferedValue() - 1).setOwner(owner).build();
 		existingOffer.setState(ExchangeOffer.State.OPEN);
 		return existingOffer;
 	}
 
 	private ExchangeOffer createFullyMatchingOffer(ExchangeOffer victim) {
-		ExchangeOffer existingOffer = ExchangeOfferMock.getBuilder()
-				.setOffered(victim.getRequired()).setOfferedValue(victim.getRequiredValue())
-				.setRequired(victim.getOffered()).setRequiredValue(victim.getOfferedValue())
-				.setOwner(owner).build();
+		ExchangeOffer existingOffer =
+				ExchangeOfferMock.getBuilder().setOffered(victim.getRequired()).setOfferedValue(victim.getRequiredValue()).setRequired(victim.getOffered())
+						.setRequiredValue(victim.getOfferedValue()).setOwner(owner).build();
 		existingOffer.setState(ExchangeOffer.State.OPEN);
 		return existingOffer;
 	}
 
 	private ExchangeOffer createExcessiveMatchingOffer(ExchangeOffer victim) {
-		ExchangeOffer existingOffer = ExchangeOfferMock.getBuilder()
-				.setOffered(victim.getRequired()).setOfferedValue(victim.getRequiredValue() + 2)
-				.setRequired(victim.getOffered()).setRequiredValue(victim.getOfferedValue() + 1)
-				.setOwner(owner).build();
+		ExchangeOffer existingOffer =
+				ExchangeOfferMock.getBuilder().setOffered(victim.getRequired()).setOfferedValue(victim.getRequiredValue() + 2).setRequired(victim.getOffered())
+						.setRequiredValue(victim.getOfferedValue() + 1).setOwner(owner).build();
 		existingOffer.setState(ExchangeOffer.State.OPEN);
 		return existingOffer;
 	}
@@ -159,8 +142,7 @@ public class ExchangeOfferTest {
 		ExchangeOffer existingOffer = createFullyMatchingOffer(victim);
 		ExchangeOffer.State state;
 
-		state = victim.processAndFinalise(existingOffer, victim.getRequiredValue(), victim.getOfferedValue())
-				.getState();
+		state = victim.processAndFinalise(existingOffer, victim.getRequiredValue(), victim.getOfferedValue()).getState();
 		assertEquals(ExchangeOffer.State.FINALISED, state);
 
 		state = victim.processAndFinalise(victim, victim.getOfferedValue(), victim.getRequiredValue()).getState();

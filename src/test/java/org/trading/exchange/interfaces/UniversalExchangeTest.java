@@ -40,9 +40,8 @@ public class UniversalExchangeTest {
 
 	private UniversalExchange victim;
 
-	static org.trading.exchange.publicInterfaces.Market setUpExchangeOffer(
-			org.trading.exchange.publicInterfaces.Market market,
-			org.trading.exchange.publicInterfaces.ExchangeOffer exchangeOffer) {
+	static org.trading.exchange.publicInterfaces.Market setUpExchangeOffer(org.trading.exchange.publicInterfaces.Market market,
+																		   org.trading.exchange.publicInterfaces.ExchangeOffer exchangeOffer) {
 		doReturn(true).when(market).validate(exchangeOffer);
 		doReturn(exchangeOffer).when(market).accept(exchangeOffer);
 
@@ -59,8 +58,7 @@ public class UniversalExchangeTest {
 		return setUpExchangeOffer(exchangeOffer, offered, 400L, required, 1L);
 	}
 
-	static ExchangeOffer setUpExchangeOffer(ExchangeOffer exchangeOffer, Commodity offered, long offeredValue,
-											Commodity required, long requiredValue) {
+	static ExchangeOffer setUpExchangeOffer(ExchangeOffer exchangeOffer, Commodity offered, long offeredValue, Commodity required, long requiredValue) {
 		doReturn(exchangeOffer).when(exchangeOffer).validate();
 		doReturn(exchangeOffer).when(exchangeOffer).preProcess();
 		doReturn(exchangeOffer).when(exchangeOffer).open();
@@ -72,19 +70,14 @@ public class UniversalExchangeTest {
 		doReturn(offeredValue).when(exchangeOffer).getOfferedValue();
 		doReturn(required).when(exchangeOffer).getRequired();
 		doReturn(requiredValue).when(exchangeOffer).getRequiredValue();
-		doReturn(new SimpleDecimal(offeredValue).divide(new SimpleDecimal(requiredValue))).when(exchangeOffer)
-				.getExchangeRate();
-		doReturn(new SimpleDecimal(requiredValue).divide(new SimpleDecimal(offeredValue))).when(exchangeOffer)
-				.getInverseExchangeRate();
+		doReturn(new SimpleDecimal(offeredValue).divide(new SimpleDecimal(requiredValue))).when(exchangeOffer).getExchangeRate();
+		doReturn(new SimpleDecimal(requiredValue).divide(new SimpleDecimal(offeredValue))).when(exchangeOffer).getInverseExchangeRate();
 		return exchangeOffer;
 	}
 
-	static void setUpExchangeOfferToMatch(
-			Collection<? extends org.trading.exchange.publicInterfaces.ExchangeOffer> offers,
-			org.trading.exchange.publicInterfaces.ExchangeOffer exchangeOffer) {
-		setUpExchangeOfferToMatch(
-				offers.toArray(new org.trading.exchange.publicInterfaces.ExchangeOffer[offers.size()]),
-				exchangeOffer);
+	static void setUpExchangeOfferToMatch(Collection<? extends org.trading.exchange.publicInterfaces.ExchangeOffer> offers,
+										  org.trading.exchange.publicInterfaces.ExchangeOffer exchangeOffer) {
+		setUpExchangeOfferToMatch(offers.toArray(new org.trading.exchange.publicInterfaces.ExchangeOffer[offers.size()]), exchangeOffer);
 	}
 
 	static void setUpExchangeOfferToMatch(org.trading.exchange.publicInterfaces.ExchangeOffer[] offers,
@@ -111,9 +104,8 @@ public class UniversalExchangeTest {
 		doReturn(true).when(location).checkCommodity(offered);
 		doReturn(true).when(location).checkCommodity(required);
 
-		requiredMarket = new MarketMock.Builder<MarketMock>().setId("requiredMarketId").setLocation(location)
-				.setName("requiredMarketName").setOffered(offered).setRequired(required).setOwner(owner)
-				.setAutoMatching(true).accept(order2).accept(order1).build();
+		requiredMarket = new MarketMock.Builder<MarketMock>().setId("requiredMarketId").setLocation(location).setName("requiredMarketName").setOffered(offered)
+				.setRequired(required).setOwner(owner).setAutoMatching(true).accept(order2).accept(order1).build();
 		assertEquals(2, requiredMarket.getOffers().size());
 
 		order11 = mock(ExchangeOffer.class);
@@ -128,9 +120,9 @@ public class UniversalExchangeTest {
 		doReturn(true).when(location).checkCommodity(offered);
 		doReturn(true).when(location).checkCommodity(notRequired);
 
-		notRequiredMarket = new MarketMock.Builder<MarketMock>().setId("notRequiredMarketId").setLocation(location)
-				.setName("notRequiredMarketName").setOffered(offered).setRequired(notRequired).setOwner(owner)
-				.setAutoMatching(true).accept(order12).accept(order11).build();
+		notRequiredMarket =
+				new MarketMock.Builder<MarketMock>().setId("notRequiredMarketId").setLocation(location).setName("notRequiredMarketName").setOffered(offered)
+						.setRequired(notRequired).setOwner(owner).setAutoMatching(true).accept(order12).accept(order11).build();
 		assertEquals(2, notRequiredMarket.getOffers().size());
 
 		victim = new UniversalExchangeMock(name, strategy, owner, true, requiredMarket, notRequiredMarket);
@@ -157,8 +149,7 @@ public class UniversalExchangeTest {
 		UniversalExchange platform = mock(UniversalExchange.class);
 		Owner owner = mock(Owner.class);
 
-		UniversalExchange test =
-				new UniversalExchangeMock(name, strategy, platform, owner, true, requiredMarket, notRequiredMarket);
+		UniversalExchange test = new UniversalExchangeMock(name, strategy, platform, owner, true, requiredMarket, notRequiredMarket);
 		assertEquals(platform, test.getPlatform());
 	}
 
@@ -214,13 +205,11 @@ public class UniversalExchangeTest {
 	@Test
 	public void getMatchingExchangeOffers() throws Exception {
 		ExchangeOffer exchangeOffer = mock(ExchangeOffer.class);
-		@SuppressWarnings("unchecked")
-		Collection<? extends ExchangeOffer> expected = mock(Collection.class);
+		@SuppressWarnings("unchecked") Collection<? extends ExchangeOffer> expected = mock(Collection.class);
 		org.trading.exchange.publicInterfaces.Market market = mock(org.trading.exchange.publicInterfaces.Market.class);
 		doReturn(expected).when(strategy).getMatching(exchangeOffer, market, victim);
 
-		Collection<? extends org.trading.exchange.publicInterfaces.ExchangeOffer> result =
-				victim.getMatching(exchangeOffer, market);
+		Collection<? extends org.trading.exchange.publicInterfaces.ExchangeOffer> result = victim.getMatching(exchangeOffer, market);
 		verify(strategy).getMatching(exchangeOffer, market, victim);
 		assertEquals(expected, result);
 	}
@@ -232,8 +221,7 @@ public class UniversalExchangeTest {
 		doReturn(required).when(exchangeOffer).getOffered();
 
 		org.trading.exchange.publicInterfaces.ExchangeOffer[] exchangeOffers = new ExchangeOffer[1];
-		org.trading.exchange.publicInterfaces.Exchanged expected =
-				mock(org.trading.exchange.publicInterfaces.Exchanged.class);
+		org.trading.exchange.publicInterfaces.Exchanged expected = mock(org.trading.exchange.publicInterfaces.Exchanged.class);
 		org.trading.exchange.publicInterfaces.Market market = mock(org.trading.exchange.publicInterfaces.Market.class);
 		doReturn(expected).when(strategy).match(exchangeOffer, market, victim, exchangeOffers);
 
@@ -305,15 +293,14 @@ public class UniversalExchangeTest {
 		org.trading.exchange.publicInterfaces.Market market = mock(org.trading.exchange.publicInterfaces.Market.class);
 		doReturn(true).when(market).validate(exchangeOffer);
 
-		org.trading.exchange.publicInterfaces.ExchangeOffer result = victim.process(exchangeOffer, market, victim,
-				victim.getMatching(exchangeOffer, market).toArray(new ExchangeOffer[1]));
+		org.trading.exchange.publicInterfaces.ExchangeOffer result =
+				victim.process(exchangeOffer, market, victim, victim.getMatching(exchangeOffer, market).toArray(new ExchangeOffer[1]));
 		assertEquals(exchangeOffer, result);
 	}
 
 	@Test
 	public void postProcessExchangeOfferImplementation() throws Exception {
-		ExchangeOffer exchangeOffer =
-				mock(ExchangeOffer.class);
+		ExchangeOffer exchangeOffer = mock(ExchangeOffer.class);
 		doReturn(exchangeOffer).when(exchangeOffer).validate();
 		doReturn(exchangeOffer).when(exchangeOffer).postProcess();
 		Exchanged exchanged = mock(Exchanged.class);
@@ -336,8 +323,7 @@ public class UniversalExchangeTest {
 	public void finaliseExchangeOfferImplementation() throws Exception {
 		ExchangeOffer exchangeOffer = mock(ExchangeOffer.class);
 		exchangeOffer = setUpExchangeOffer(exchangeOffer, required, offered);
-		setUpExchangeOfferToMatch(victim.getMarkets(exchangeOffer).stream().findFirst().get().getOffers(State.OPEN),
-				exchangeOffer);
+		setUpExchangeOfferToMatch(victim.getMarkets(exchangeOffer).stream().findFirst().get().getOffers(State.OPEN), exchangeOffer);
 		assertEquals(1, victim.getMarkets(exchangeOffer).size());
 
 		Exchanged exchanged = mock(Exchanged.class);
@@ -366,8 +352,7 @@ public class UniversalExchangeTest {
 		setUpExchangeOfferToMatch(markets.stream().findFirst().get().getOffers(State.OPEN), exchangeOffer);
 		assertEquals(1, victim.getMarkets(exchangeOffer).size());
 
-		Collection<? extends org.trading.exchange.publicInterfaces.ExchangeOffer> result =
-				victim.getMatching(exchangeOffer, requiredMarket, victim);
+		Collection<? extends org.trading.exchange.publicInterfaces.ExchangeOffer> result = victim.getMatching(exchangeOffer, requiredMarket, victim);
 		assertEquals(2, result.size());
 		assert (orders.containsAll(result) && result.containsAll(orders));
 	}
@@ -387,8 +372,7 @@ public class UniversalExchangeTest {
 			doReturn(ex.process()).when(exchangeOffer).match(ex);
 			doReturn(true).when(market).validate(ex);
 		}
-		org.trading.exchange.publicInterfaces.Exchanged expected =
-				mock(org.trading.exchange.publicInterfaces.Exchanged.class);
+		org.trading.exchange.publicInterfaces.Exchanged expected = mock(org.trading.exchange.publicInterfaces.Exchanged.class);
 		doReturn(exchangeOffer).when(expected).getExchangeOffer();
 		doReturn(exchangeOffers).when(expected).getMatchedExchangeOffers();
 		setUpExchangeOfferToMatch(exchangeOffers, exchangeOffer);
@@ -396,8 +380,7 @@ public class UniversalExchangeTest {
 		setUpExchangeOfferToMatch(exchangeOffers1, exchangeOffer);
 		assertEquals(2, exchangeOffers1.length);
 
-		org.trading.exchange.publicInterfaces.Exchanged result =
-				victim.match(exchangeOffer, market, victim, exchangeOffers1);
+		org.trading.exchange.publicInterfaces.Exchanged result = victim.match(exchangeOffer, market, victim, exchangeOffers1);
 		assertEquals(expected.getExchangeOffer(), result.getExchangeOffer());
 		assertEquals(expected.getMatchedExchangeOffers(), result.getMatchedExchangeOffers());
 	}
@@ -447,34 +430,28 @@ public class UniversalExchangeTest {
 		@Test
 		public void validateExchangeOffer() throws Exception {
 			ExchangeOffer exchangeOffer = mock(ExchangeOffer.class);
-			org.trading.exchange.publicInterfaces.Market market =
-					mock(org.trading.exchange.publicInterfaces.Market.class);
+			org.trading.exchange.publicInterfaces.Market market = mock(org.trading.exchange.publicInterfaces.Market.class);
 			doReturn(exchangeOffer).when(platformMock).validate(exchangeOffer, market, platformMock);
 
-			org.trading.exchange.publicInterfaces.ExchangeOffer result =
-					victimStrategy.validate(exchangeOffer, market, platformMock);
+			org.trading.exchange.publicInterfaces.ExchangeOffer result = victimStrategy.validate(exchangeOffer, market, platformMock);
 			assertEquals(exchangeOffer, result);
 		}
 
 		@Test
 		public void acceptExchangeOffer() throws Exception {
 			ExchangeOffer exchangeOffer = mock(ExchangeOffer.class);
-			org.trading.exchange.publicInterfaces.Market market =
-					mock(org.trading.exchange.publicInterfaces.Market.class);
+			org.trading.exchange.publicInterfaces.Market market = mock(org.trading.exchange.publicInterfaces.Market.class);
 			doReturn(exchangeOffer).when(platformMock).accept(exchangeOffer, market, platformMock);
 
-			org.trading.exchange.publicInterfaces.ExchangeOffer result = victimStrategy.accept(exchangeOffer, market,
-					platformMock);
+			org.trading.exchange.publicInterfaces.ExchangeOffer result = victimStrategy.accept(exchangeOffer, market, platformMock);
 			assertEquals(exchangeOffer, result);
 		}
 
 		@Test
 		public void matchExchangeOffer() throws Exception {
 			ExchangeOffer exchangeOffer = mock(ExchangeOffer.class);
-			org.trading.exchange.publicInterfaces.Market market =
-					mock(org.trading.exchange.publicInterfaces.Market.class);
-			ExchangeOffer[] matchedExchangeOffers = platformMock.getMatching(exchangeOffer, market, platformMock)
-					.toArray(new ExchangeOffer[1]);
+			org.trading.exchange.publicInterfaces.Market market = mock(org.trading.exchange.publicInterfaces.Market.class);
+			ExchangeOffer[] matchedExchangeOffers = platformMock.getMatching(exchangeOffer, market, platformMock).toArray(new ExchangeOffer[1]);
 			Exchanged exchanged = mock(Exchanged.class);
 			doReturn(exchanged).when(platformMock).match(exchangeOffer, market, platformMock, matchedExchangeOffers);
 
@@ -486,15 +463,11 @@ public class UniversalExchangeTest {
 		@Test
 		public void processExchangeOffer() throws Exception {
 			ExchangeOffer exchangeOffer = mock(ExchangeOffer.class);
-			org.trading.exchange.publicInterfaces.Market market =
-					mock(org.trading.exchange.publicInterfaces.Market.class);
-			ExchangeOffer[] matchedExchangeOffers = platformMock.getMatching(exchangeOffer, market, platformMock)
-					.toArray(new ExchangeOffer[1]);
-			doReturn(exchangeOffer).when(platformMock)
-					.process(exchangeOffer, market, platformMock, matchedExchangeOffers);
+			org.trading.exchange.publicInterfaces.Market market = mock(org.trading.exchange.publicInterfaces.Market.class);
+			ExchangeOffer[] matchedExchangeOffers = platformMock.getMatching(exchangeOffer, market, platformMock).toArray(new ExchangeOffer[1]);
+			doReturn(exchangeOffer).when(platformMock).process(exchangeOffer, market, platformMock, matchedExchangeOffers);
 
-			org.trading.exchange.publicInterfaces.ExchangeOffer result =
-					victimStrategy.process(exchangeOffer, market, platformMock);
+			org.trading.exchange.publicInterfaces.ExchangeOffer result = victimStrategy.process(exchangeOffer, market, platformMock);
 			assertEquals(exchangeOffer, result);
 		}
 
@@ -502,15 +475,11 @@ public class UniversalExchangeTest {
 		public void processExchangeOffer1() throws Exception {
 			ExchangeOffer exchangeOffer = mock(ExchangeOffer.class);
 			Exchanged exchanged = mock(Exchanged.class);
-			org.trading.exchange.publicInterfaces.Market market =
-					mock(org.trading.exchange.publicInterfaces.Market.class);
-			ExchangeOffer[] matchedExchangeOffers = platformMock.getMatching(exchangeOffer, market, platformMock)
-					.toArray(new ExchangeOffer[1]);
-			doReturn(exchangeOffer).when(platformMock)
-					.process(exchangeOffer, market, platformMock, matchedExchangeOffers);
+			org.trading.exchange.publicInterfaces.Market market = mock(org.trading.exchange.publicInterfaces.Market.class);
+			ExchangeOffer[] matchedExchangeOffers = platformMock.getMatching(exchangeOffer, market, platformMock).toArray(new ExchangeOffer[1]);
+			doReturn(exchangeOffer).when(platformMock).process(exchangeOffer, market, platformMock, matchedExchangeOffers);
 
-			org.trading.exchange.publicInterfaces.ExchangeOffer result =
-					victimStrategy.process(exchangeOffer, market, platformMock, matchedExchangeOffers);
+			org.trading.exchange.publicInterfaces.ExchangeOffer result = victimStrategy.process(exchangeOffer, market, platformMock, matchedExchangeOffers);
 			assertEquals(exchangeOffer, result);
 		}
 
@@ -519,14 +488,11 @@ public class UniversalExchangeTest {
 			ExchangeOffer exchangeOffer = mock(ExchangeOffer.class);
 			doReturn(exchangeOffer).when(exchangeOffer).postProcess();
 			Exchanged exchanged = mock(Exchanged.class);
-			org.trading.exchange.publicInterfaces.Market market =
-					mock(org.trading.exchange.publicInterfaces.Market.class);
-			ExchangeOffer[] matchedExchangeOffers = platformMock.getMatching(exchangeOffer, market, platformMock)
-					.toArray(new ExchangeOffer[1]);
+			org.trading.exchange.publicInterfaces.Market market = mock(org.trading.exchange.publicInterfaces.Market.class);
+			ExchangeOffer[] matchedExchangeOffers = platformMock.getMatching(exchangeOffer, market, platformMock).toArray(new ExchangeOffer[1]);
 			doReturn(exchanged).when(platformMock).postProcess(exchangeOffer, platformMock, matchedExchangeOffers);
 
-			org.trading.exchange.publicInterfaces.Exchanged result =
-					victimStrategy.postProcess(exchangeOffer, platformMock, matchedExchangeOffers);
+			org.trading.exchange.publicInterfaces.Exchanged result = victimStrategy.postProcess(exchangeOffer, platformMock, matchedExchangeOffers);
 			assertEquals(exchanged, result);
 		}
 
@@ -535,28 +501,22 @@ public class UniversalExchangeTest {
 			ExchangeOffer exchangeOffer = mock(ExchangeOffer.class);
 			doReturn(exchangeOffer).when(exchangeOffer).finalise();
 			Exchanged exchanged = mock(Exchanged.class);
-			org.trading.exchange.publicInterfaces.Market market =
-					mock(org.trading.exchange.publicInterfaces.Market.class);
-			ExchangeOffer[] matchedExchangeOffers = platformMock.getMatching(exchangeOffer, market, platformMock)
-					.toArray(new ExchangeOffer[1]);
+			org.trading.exchange.publicInterfaces.Market market = mock(org.trading.exchange.publicInterfaces.Market.class);
+			ExchangeOffer[] matchedExchangeOffers = platformMock.getMatching(exchangeOffer, market, platformMock).toArray(new ExchangeOffer[1]);
 			doReturn(exchanged).when(platformMock).finalise(exchangeOffer, platformMock, matchedExchangeOffers);
 
-			org.trading.exchange.publicInterfaces.Exchanged result =
-					victimStrategy.finalise(exchangeOffer, platformMock, matchedExchangeOffers);
+			org.trading.exchange.publicInterfaces.Exchanged result = victimStrategy.finalise(exchangeOffer, platformMock, matchedExchangeOffers);
 			assertEquals(exchanged, result);
 		}
 
 		@Test
 		public void getMatchingExchangeOffers() throws Exception {
-			ExchangeOffer exchangeOffer =
-					mock(ExchangeOffer.class);
+			ExchangeOffer exchangeOffer = mock(ExchangeOffer.class);
 			Collection<? extends ExchangeOffer> orders = mock(Collection.class);
-			org.trading.exchange.publicInterfaces.Market market =
-					mock(org.trading.exchange.publicInterfaces.Market.class);
+			org.trading.exchange.publicInterfaces.Market market = mock(org.trading.exchange.publicInterfaces.Market.class);
 			doReturn(orders).when(platformMock).getMatching(exchangeOffer, market, platformMock);
 
-			Collection<? extends org.trading.exchange.publicInterfaces.ExchangeOffer> result =
-					victimStrategy.getMatching(exchangeOffer, market, platformMock);
+			Collection<? extends org.trading.exchange.publicInterfaces.ExchangeOffer> result = victimStrategy.getMatching(exchangeOffer, market, platformMock);
 			assertEquals(orders, result);
 		}
 	}

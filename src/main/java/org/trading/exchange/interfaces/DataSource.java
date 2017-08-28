@@ -32,8 +32,7 @@ public interface DataSource {
 	<K> Map<String, Collection<K>> getKeysMap();
 
 	default <K, T> Collection<K> getKeys(T object) {
-		@SuppressWarnings("unchecked")
-		Collection<K> result = (Collection<K>) getKeysMap().get(object.getClass().getName());
+		@SuppressWarnings("unchecked") Collection<K> result = (Collection<K>) getKeysMap().get(object.getClass().getName());
 		return result;
 	}
 }

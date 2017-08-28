@@ -22,8 +22,7 @@ public class MarketMock implements Market {
 	private Owner owner;
 	private boolean autoMatching;
 
-	private MarketMock(String id, Location location, String name, Commodity offered, Commodity required, Owner owner,
-					   boolean autoMatching) {
+	private MarketMock(String id, Location location, String name, Commodity offered, Commodity required, Owner owner, boolean autoMatching) {
 		this.id = id;
 		this.location = location;
 		this.name = name;
@@ -33,8 +32,8 @@ public class MarketMock implements Market {
 		this.autoMatching = autoMatching;
 	}
 
-	private MarketMock(String id, Location location, String name, Commodity offered, Commodity required, Owner owner,
-					   boolean autoMatching, ExchangeOffer... offers) {
+	private MarketMock(String id, Location location, String name, Commodity offered, Commodity required, Owner owner, boolean autoMatching,
+					   ExchangeOffer... offers) {
 		this(id, location, name, offered, required, owner, autoMatching);
 		for (ExchangeOffer exchangeOffer : offers) {
 			accept(exchangeOffer);
@@ -91,15 +90,8 @@ public class MarketMock implements Market {
 
 	@Override
 	public String toString() {
-		return "MarketMock{" +
-				"id='" + id + '\'' +
-				", name='" + name + '\'' +
-				", \noffered=" + offered +
-				", \nrequired=" + required +
-				", \nlocation=" + location +
-				", \noffers=\n" + getOffers() +
-				", \nOPEN offers=\n" + getOffers(ExchangeOffer.State.OPEN) +
-				'}' + '\n' + '\n';
+		return "MarketMock{" + "id='" + id + '\'' + ", name='" + name + '\'' + ", \noffered=" + offered + ", \nrequired=" + required + ", \nlocation=" +
+				location + ", \noffers=\n" + getOffers() + ", \nOPEN offers=\n" + getOffers(ExchangeOffer.State.OPEN) + '}' + '\n' + '\n';
 	}
 
 	public static class Builder<T> implements org.trading.exchange.publicInterfaces.Market.Builder {
@@ -144,8 +136,7 @@ public class MarketMock implements Market {
 
 		@Override
 		public Builder<T> accept(ExchangeOffer exchangeOffer) {
-			@SuppressWarnings("unchecked")
-			Collection<ExchangeOffer> orders = (Collection<ExchangeOffer>) this.offers;
+			@SuppressWarnings("unchecked") Collection<ExchangeOffer> orders = (Collection<ExchangeOffer>) this.offers;
 			orders.add(exchangeOffer);
 			return this;
 		}
@@ -163,9 +154,8 @@ public class MarketMock implements Market {
 
 		@Override
 		public T build() {
-			@SuppressWarnings("unchecked")
-			T result = (T) new MarketMock(id, location, name, offered, required, owner, autoMatching,
-					offers.toArray(new ExchangeOffer[offers.size()]));
+			@SuppressWarnings("unchecked") T result =
+					(T) new MarketMock(id, location, name, offered, required, owner, autoMatching, offers.toArray(new ExchangeOffer[offers.size()]));
 			return result;
 		}
 	}

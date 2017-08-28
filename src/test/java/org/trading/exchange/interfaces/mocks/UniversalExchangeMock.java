@@ -31,8 +31,7 @@ public class UniversalExchangeMock implements UniversalExchange {
 	private Owner owner;
 	private boolean autoMatching;
 
-	public UniversalExchangeMock(String name, Strategy strategy, Owner owner, boolean autoMatching, Market...
-			markets) {
+	public UniversalExchangeMock(String name, Strategy strategy, Owner owner, boolean autoMatching, Market... markets) {
 		this.id = UUID.randomUUID().toString();
 		this.platform = this;
 		this.name = name;
@@ -44,9 +43,7 @@ public class UniversalExchangeMock implements UniversalExchange {
 		this.autoMatching = autoMatching;
 	}
 
-	public UniversalExchangeMock(String name, Strategy strategy, UniversalExchange platform, Owner owner,
-								 boolean autoMatching,
-								 Market... markets) {
+	public UniversalExchangeMock(String name, Strategy strategy, UniversalExchange platform, Owner owner, boolean autoMatching, Market... markets) {
 		this(name, strategy, owner, autoMatching, markets);
 		this.platform = platform;
 	}
@@ -103,8 +100,7 @@ public class UniversalExchangeMock implements UniversalExchange {
 	@Override
 	public Market open(Market market, UniversalExchange platform) throws IllegalStateException {
 		validate(market, platform);
-		@SuppressWarnings("unchecked")
-		Collection<Market> markets = (Collection<Market>) platform.getMarkets();
+		@SuppressWarnings("unchecked") Collection<Market> markets = (Collection<Market>) platform.getMarkets();
 		if (!markets.add(market)) {
 			throw new IllegalStateException(market + " can not be created on " + platform);
 		}
@@ -132,8 +128,7 @@ public class UniversalExchangeMock implements UniversalExchange {
 	}
 
 	@Override
-	public ExchangeOffer accept(ExchangeOffer exchangeOffer, Market market, UniversalExchange platform)
-			throws IllegalStateException {
+	public ExchangeOffer accept(ExchangeOffer exchangeOffer, Market market, UniversalExchange platform) throws IllegalStateException {
 		ExchangeOffer offer = (ExchangeOffer) platform.validate(exchangeOffer, market, platform).preProcess();
 		if (market.validate(offer)) {
 			if (isAutoMatching() && market.isAutoMatching()) {
@@ -148,8 +143,7 @@ public class UniversalExchangeMock implements UniversalExchange {
 	}
 
 	@Override
-	public ExchangeOffer process(ExchangeOffer exchangeOffer, Market market, UniversalExchange platform,
-								 ExchangeOffer... matching) {
+	public ExchangeOffer process(ExchangeOffer exchangeOffer, Market market, UniversalExchange platform, ExchangeOffer... matching) {
 		return (ExchangeOffer) validate(exchangeOffer, market, platform).process();
 	}
 
@@ -172,28 +166,23 @@ public class UniversalExchangeMock implements UniversalExchange {
 	}
 
 	@Override
-	public Collection<? extends ExchangeOffer> getMatching(ExchangeOffer exchangeOffer, Market market,
-														   UniversalExchange platform) {
+	public Collection<? extends ExchangeOffer> getMatching(ExchangeOffer exchangeOffer, Market market, UniversalExchange platform) {
 		if (market.validate(exchangeOffer)) {
-			return market.getOffers(ExchangeOffer.State.OPEN).stream().filter(offer -> offer.isMatching(exchangeOffer))
-					.collect(Collectors.toList());
+			return market.getOffers(ExchangeOffer.State.OPEN).stream().filter(offer -> offer.isMatching(exchangeOffer)).collect(Collectors.toList());
 		}
 		return new LinkedList<>();
 	}
 
 	@Override
-	public Exchanged match(ExchangeOffer exchangeOffer, Market market, UniversalExchange platform,
-						   ExchangeOffer... matching) {
+	public Exchanged match(ExchangeOffer exchangeOffer, Market market, UniversalExchange platform, ExchangeOffer... matching) {
 		if (market.validate(exchangeOffer)) {
 			Collection<ExchangeOffer> matched = new LinkedList<>();
-			Stream.of(matching)
-					.filter(market::validate)
-					.filter(offer -> (!ExchangeOffer.State.OPEN.precedes(offer.getState()) &&
-							offer.isMatching(exchangeOffer))).map(org.trading.exchange.interfaces.ExchangeOffer.class::cast)
+			Stream.of(matching).filter(market::validate)
+					.filter(offer -> (!ExchangeOffer.State.OPEN.precedes(offer.getState()) && offer.isMatching(exchangeOffer)))
+					.map(org.trading.exchange.interfaces.ExchangeOffer.class::cast)
 					.sorted(comparing(org.trading.exchange.interfaces.ExchangeOffer::getExchangeRate))
 					.forEach(offer -> matched.add(exchangeOffer.match(offer)));
-			org.trading.exchange.interfaces.Exchanged exchanged = mock(org.trading.exchange.interfaces.Exchanged
-					.class);
+			org.trading.exchange.interfaces.Exchanged exchanged = mock(org.trading.exchange.interfaces.Exchanged.class);
 
 			doReturn(exchangeOffer).when(exchanged).getExchangeOffer();
 			doReturn(matched).when(exchanged).getMatchedExchangeOffers();
@@ -204,10 +193,7 @@ public class UniversalExchangeMock implements UniversalExchange {
 
 	@Override
 	public String toString() {
-		return "UniversalExchangeMock{" +
-				"name='" + name + '\'' +
-				", strategy=" + strategy +
-				", \nmarkets=\n" + markets +
+		return "UniversalExchangeMock{" + "name='" + name + '\'' + ", strategy=" + strategy + ", \nmarkets=\n" + markets +
 //                ", platform=" + platform +
 				'}';
 	}

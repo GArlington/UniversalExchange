@@ -56,10 +56,8 @@ public interface ExchangeOffer extends org.trading.exchange.publicInterfaces.Exc
 	 * @param exchangeOffer
 	 */
 	default boolean isPartiallyMatched(ExchangeOffer exchangeOffer) {
-		return (!State.OPEN.precedes(exchangeOffer.getState())
-				&& getOffered().equals(exchangeOffer.getRequired()) && getRequired().equals(exchangeOffer.getOffered())
-				&& getExchangeRate().compareTo(exchangeOffer.getInverseExchangeRate()) <= 0
-		);
+		return (!State.OPEN.precedes(exchangeOffer.getState()) && getOffered().equals(exchangeOffer.getRequired()) &&
+				getRequired().equals(exchangeOffer.getOffered()) && getExchangeRate().compareTo(exchangeOffer.getInverseExchangeRate()) <= 0);
 	}
 
 	/**
@@ -79,8 +77,7 @@ public interface ExchangeOffer extends org.trading.exchange.publicInterfaces.Exc
 							synchronized (exchangeOffer.getLock()) {
 								if (!State.OPEN.precedes(exchangeOffer.getState())) {
 									long oValue = Math.min(getOfferedValue(), exchangeOffer.getRequiredValue());
-									long rValue = exchangeOffer.getInverseExchangeRate()
-											.multiply(new SimpleDecimal(oValue)).longValue(true);
+									long rValue = exchangeOffer.getInverseExchangeRate().multiply(new SimpleDecimal(oValue)).longValue(true);
 									processAndFinalise(this, oValue, rValue);
 									return processAndFinalise(exchangeOffer, rValue, oValue);
 								}

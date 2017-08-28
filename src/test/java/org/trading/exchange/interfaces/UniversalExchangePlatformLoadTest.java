@@ -43,8 +43,8 @@ public class UniversalExchangePlatformLoadTest {
 		doReturn(true).when(location).checkCommodity(required);
 		Owner owner = mock(Owner.class);
 
-		return new MarketMock.Builder<MarketMock>().setId("marketId").setLocation(location).setName("marketName")
-				.setOffered(offered).setRequired(required).setOwner(owner).setAutoMatching(true).build();
+		return new MarketMock.Builder<MarketMock>().setId("marketId").setLocation(location).setName("marketName").setOffered(offered).setRequired(required)
+				.setOwner(owner).setAutoMatching(true).build();
 
 	}
 
@@ -75,8 +75,7 @@ public class UniversalExchangePlatformLoadTest {
 		Commodity offered = mock(Commodity.class);
 		Commodity required = mock(Commodity.class);
 		org.trading.exchange.publicInterfaces.Market market = victim.open(createMarket(offered, required));
-		org.trading.exchange.interfaces.ExchangeOffer exchangeOffer =
-				mock(org.trading.exchange.interfaces.ExchangeOffer.class);
+		org.trading.exchange.interfaces.ExchangeOffer exchangeOffer = mock(org.trading.exchange.interfaces.ExchangeOffer.class);
 		doReturn(offered).when(exchangeOffer).getOffered();
 		doReturn(required).when(exchangeOffer).getRequired();
 		doReturn(exchangeOffer).when(exchangeOffer).preProcess();

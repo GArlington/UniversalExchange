@@ -12,8 +12,7 @@ import java.util.stream.Collectors;
 public interface Market extends org.trading.exchange.publicInterfaces.Market {
 	@Override
 	default Collection<? extends ExchangeOffer> getOffers(ExchangeOffer.State state) {
-		return org.trading.exchange.publicInterfaces.Market.super.getOffers(state).stream().sorted(Comparator
-				.comparing(o -> (((org.trading.exchange.interfaces.ExchangeOffer) o).getExchangeRate())))
-				.collect(Collectors.toList());
+		return org.trading.exchange.publicInterfaces.Market.super.getOffers(state).stream()
+				.sorted(Comparator.comparing(o -> (((org.trading.exchange.interfaces.ExchangeOffer) o).getExchangeRate()))).collect(Collectors.toList());
 	}
 }

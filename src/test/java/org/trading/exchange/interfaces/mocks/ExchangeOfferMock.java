@@ -1,7 +1,7 @@
 package org.trading.exchange.interfaces.mocks;
 
 import org.math.SimpleDecimal;
-import org.processing.Processable;
+import org.processing.ProcessState;
 import org.trading.exchange.interfaces.ExchangeOffer;
 import org.trading.exchange.publicInterfaces.Commodity;
 import org.trading.exchange.publicInterfaces.Exchanged;
@@ -27,7 +27,7 @@ public class ExchangeOfferMock implements ExchangeOffer {
 	private long requiredValue;
 	private long matchedRequiredValue;
 	private ExchangeOffer.State state = State.INITIALISED;
-	private Processable.State processState = Processable.State.INITIALISED;
+	private ProcessState processState = ProcessState.INITIALISED;
 	private Exchanged exchanged;
 	private int exchangeRatePrecision;
 
@@ -156,12 +156,12 @@ public class ExchangeOfferMock implements ExchangeOffer {
 	}
 
 	@Override
-	public Processable.State getProcessState() {
+	public ProcessState getProcessState() {
 		return processState;
 	}
 
 	@Override
-	public void setProcessState(Processable.State state) {
+	public void setProcessState(ProcessState state) {
 		this.processState = state;
 	}
 
